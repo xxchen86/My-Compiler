@@ -13,6 +13,7 @@ struct Token {
         // Keyword,
         Operator,
         // Type,
+        EndOfFile
     };
 
     Type type;
@@ -63,13 +64,31 @@ struct Token {
 
 class Lexer {
 public:
-    std::optional<Token> nextToken() {
+    Lexer() : bufferedToken(readToken()) {}
+
+    Token getToken() {
+        if (bufferedToken.type != Token::Type::EndOfFile) {
+            auto ret = bufferedToken;
+            bufferedToken = readToken();
+            return ret;
+        } else {
+            return bufferedToken;
+        }
+    }
+
+    Token peekToken() {
+        return bufferedToken;
+    }
+
+private:
+    /// Reads the next token from standard input. Return nullopt if EOF is reached.
+    Token readToken() {
         char c = std::cin.peek();
         if (c == ' ' || c == '\n' || c == '\t') {
             std::cin.get(); // Skip whitespace
-            return nextToken(); // Recurse to get the next token
+            return readToken(); // Recurse to get the next token
         } else if (c == EOF) {
-            return std::nullopt;
+            return Token{Token::Type::EndOfFile, {}};
         } else if (c > '0' && c < '9') {
             int number;
             std::cin >> number;
@@ -93,4 +112,6 @@ public:
             // }
         }
     }
+
+    Token bufferedToken;
 };
