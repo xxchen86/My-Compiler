@@ -7,10 +7,11 @@
 #include <memory>
 
 
-class Parser {
+class LL1Parser {
 public:
-    Parser(Lexer& lexer) : lexer(lexer) {}
+    LL1Parser(Lexer& lexer) : lexer(lexer) {}
 
+    /// expr ::= literal | literal op expr
     std::unique_ptr<ast::Expression> parseExpression() {
         auto token = lexer.getToken();
         if (token.type == Token::Type::EndOfFile) {
@@ -18,10 +19,10 @@ public:
         }
         if (token.type == Token::Type::Literal) {
             auto literal = std::make_unique<ast::LiteralExpression>(std::get<int>(token.value));
-            if (lexer.peekToken().type == Token::Type::Operator) {
+            if (lexer.peekToken().isOperator()) {
                 // If the next token is an operator, we need to parse a binary expression
                 token = lexer.getToken(); // Consume the operator token
-                char op = std::get<char>(token.value);
+                char op = token.type;
                 auto right = parseExpression();
                 return std::make_unique<ast::BinaryExpression>(std::move(literal), std::move(right), op);
             } else {

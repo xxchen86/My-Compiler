@@ -5,7 +5,7 @@
 
 int main(int, char**){
     Lexer lexer;
-    Parser parser(lexer);
+    LL1Parser parser(lexer);
     auto expression = parser.parseExpression();
     if (expression) {
         expression->print(std::cout);

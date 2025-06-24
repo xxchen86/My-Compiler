@@ -1,35 +1,26 @@
 #pragma once
 
-#include <optional>
-#include <string>
-#include <string_view>
 #include <variant>
 #include <iostream>
 
 struct Token {
-    enum class Type {
+    using Value = std::variant<int>;
+
+    enum Type: char {
         Literal,
-        // Identifier,
-        // Keyword,
-        Operator,
-        // Type,
-        EndOfFile
+        EndOfFile = EOF,
+        Add = '+',
+        Subtract = '-',
     };
 
-    Type type;
-    std::variant<int, char, std::string> value;
+    Token(Type type, Value value = {})
+        : type(type), value(value) {}
 
-    static bool isCharOperator(char c) {
-        switch(c) {
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case '=':
-                return true;
-            default:
-                return false;
-        }
+    Type type;
+    Value value;
+
+    bool isOperator() const {
+        return type == Add || type == Subtract;
     }
 
     // static bool isStringIdentifier(std::string_view str) {
@@ -67,7 +58,7 @@ public:
     Lexer() : bufferedToken(readToken()) {}
 
     Token getToken() {
-        if (bufferedToken.type != Token::Type::EndOfFile) {
+        if (bufferedToken.type != EOF) {
             auto ret = bufferedToken;
             bufferedToken = readToken();
             return ret;
@@ -81,35 +72,17 @@ public:
     }
 
 private:
-    /// Reads the next token from standard input. Return nullopt if EOF is reached.
     Token readToken() {
         char c = std::cin.peek();
         if (c == ' ' || c == '\n' || c == '\t') {
-            std::cin.get(); // Skip whitespace
-            return readToken(); // Recurse to get the next token
-        } else if (c == EOF) {
-            return Token{Token::Type::EndOfFile, {}};
+            std::cin.get();
+            return readToken();
         } else if (c > '0' && c < '9') {
             int number;
             std::cin >> number;
             return Token{Token::Type::Literal, number};
-        } else if (Token::isCharOperator(c)) {
-            std::cin.get();
-            return Token{Token::Type::Operator, c};
         } else {
-            throw std::runtime_error("Unexpected character: " + std::string(1, c));
-            // std::string identifier;
-            // std::cin >> identifier;
-            // if (!Token::isStringIdentifier(identifier)) {
-            //     throw std::runtime_error("Invalid identifier: " + identifier);
-            // }
-            // if (Token::isStringKeyword(identifier)) {
-            //     return Token{Token::Type::Keyword, identifier};
-            // } else if (Token::isStringType(identifier)) {
-            //     return Token{Token::Type::Type, identifier};
-            // } else {
-            //     return Token{Token::Type::Identifier, identifier};
-            // }
+            return Token{Token::Type(std::cin.get())};
         }
     }
 
