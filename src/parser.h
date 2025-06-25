@@ -34,10 +34,11 @@ public:
 
     /// AdditiveExprRemainder ::= Add PrimaryExpr AdditiveExprRemainder | Subtract PrimaryExpr AdditiveExprRemainder | ε
     std::unique_ptr<ast::Expression> parseAddtiveExprRemainder(std::unique_ptr<ast::Expression> left) {
-        auto op = lexer.getToken();
-        if (op.type != Token::Add && op.type != Token::Subtract) {
+        auto token = lexer.peekToken();
+        if (token.type != Token::Add && token.type != Token::Subtract) {
             return left;
         }
+        auto op = lexer.getToken();
         auto right = parsePrimaryExpr();
         auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
         return parseAddtiveExprRemainder(std::move(expr));

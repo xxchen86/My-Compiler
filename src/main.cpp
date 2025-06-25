@@ -6,7 +6,7 @@
 
 int main(int, char**){
     std::istringstream iss;
-    iss.str("1 - (3 + 4)");
+    iss.str("1 - (3 + 4) + 5");
 
     Lexer lexer(iss);
     LL1Parser parser(lexer);
