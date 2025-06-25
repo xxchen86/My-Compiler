@@ -1,14 +1,18 @@
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include "lexer.h"
 #include "parser.h"
 
 int main(int, char**){
-    Lexer lexer;
+    std::istringstream iss;
+    iss.str("1 - (3 + 4)");
+
+    Lexer lexer(iss);
     LL1Parser parser(lexer);
-    auto expression = parser.parseExpression();
-    if (expression) {
-        expression->print(std::cout);
+    auto expr = parser.parseAddtiveExpr();
+    if (expr) {
+        expr->print(std::cout);
     } else {
         std::cout << "No expression parsed.\n";
     }

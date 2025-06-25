@@ -1,5 +1,6 @@
 #pragma once
 
+#include <istream>
 #include <variant>
 #include <iostream>
 
@@ -8,9 +9,11 @@ struct Token {
 
     enum Type: char {
         Literal,
-        EndOfFile = EOF,
         Add = '+',
         Subtract = '-',
+        LeftParen = '(',
+        RightParen = ')',
+        EndOfFile = EOF,
     };
 
     Token(Type type, Value value = {})
@@ -55,7 +58,7 @@ struct Token {
 
 class Lexer {
 public:
-    Lexer() : bufferedToken(readToken()) {}
+    Lexer(std::istream& in) : in(in), bufferedToken(readToken()) {}
 
     Token getToken() {
         if (bufferedToken.type != EOF) {
@@ -73,18 +76,20 @@ public:
 
 private:
     Token readToken() {
-        char c = std::cin.peek();
+        char c = in.peek();
         if (c == ' ' || c == '\n' || c == '\t') {
-            std::cin.get();
+            in.get();
             return readToken();
         } else if (c > '0' && c < '9') {
             int number;
-            std::cin >> number;
+            in >> number;
             return Token{Token::Type::Literal, number};
         } else {
-            return Token{Token::Type(std::cin.get())};
+            // a char is treated as a token
+            return Token{Token::Type(in.get())};
         }
     }
 
+    std::istream& in;
     Token bufferedToken;
 };

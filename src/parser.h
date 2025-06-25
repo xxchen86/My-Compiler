@@ -4,6 +4,7 @@
 
 #include "ast.h"
 #include "lexer.h"
+#include <cassert>
 #include <memory>
 
 
@@ -11,26 +12,35 @@ class LL1Parser {
 public:
     LL1Parser(Lexer& lexer) : lexer(lexer) {}
 
-    /// expr ::= literal | literal op expr
-    std::unique_ptr<ast::Expression> parseExpression() {
+    /// PrimaryExpr ::= LiteralExpr | LeftParen AdditiveExpr RightParen
+    std::unique_ptr<ast::Expression> parsePrimaryExpr() {
         auto token = lexer.getToken();
-        if (token.type == Token::Type::EndOfFile) {
-            throw std::runtime_error("Unexpected end of input");
-        }
-        if (token.type == Token::Type::Literal) {
-            auto literal = std::make_unique<ast::LiteralExpression>(std::get<int>(token.value));
-            if (lexer.peekToken().isOperator()) {
-                // If the next token is an operator, we need to parse a binary expression
-                token = lexer.getToken(); // Consume the operator token
-                char op = token.type;
-                auto right = parseExpression();
-                return std::make_unique<ast::BinaryExpression>(std::move(literal), std::move(right), op);
-            } else {
-                return literal;
-            }
+        if (token.type == Token::Literal) {
+            return std::make_unique<ast::LiteralExpression>(std::get<int>(token.value));
+        } else if (token.type == Token::LeftParen) {
+            auto ret = parseAddtiveExpr();
+            lexer.getToken();
+            return ret;
         } else {
-            throw std::runtime_error("Unexpected token type");
+            throw std::runtime_error("Expected Literal or LeftParen");
         }
+    }
+
+    /// AdditiveExpr ::= PrimaryExpr AdditiveExprRemainder
+    std::unique_ptr<ast::Expression> parseAddtiveExpr() {
+        auto left = parsePrimaryExpr();
+        return parseAddtiveExprRemainder(std::move(left));
+    }
+
+    /// AdditiveExprRemainder ::= Add PrimaryExpr AdditiveExprRemainder | Subtract PrimaryExpr AdditiveExprRemainder | ε
+    std::unique_ptr<ast::Expression> parseAddtiveExprRemainder(std::unique_ptr<ast::Expression> left) {
+        auto op = lexer.getToken();
+        if (op.type != Token::Add && op.type != Token::Subtract) {
+            return left;
+        }
+        auto right = parsePrimaryExpr();
+        auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
+        return parseAddtiveExprRemainder(std::move(expr));
     }
 
 private:
