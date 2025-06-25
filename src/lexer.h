@@ -7,7 +7,7 @@
 struct Token {
     using Value = std::variant<int>;
 
-    enum Type: char {
+    enum Type: int {
         Literal,
         Add = '+',
         Subtract = '-',
