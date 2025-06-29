@@ -8,12 +8,15 @@ struct Token {
     using Value = std::variant<int>;
 
     enum Type: int {
-        Literal,
+        EndOfFile = EOF,
         Add = '+',
         Subtract = '-',
+        Multiply = '*',
+        Divide = '/',
         LeftParen = '(',
         RightParen = ')',
-        EndOfFile = EOF,
+
+        Literal = 256, // Start from 256 to avoid conflicts with char tokens
     };
 
     Token(Type type, Value value = {})
@@ -21,38 +24,6 @@ struct Token {
 
     Type type;
     Value value;
-
-    bool isOperator() const {
-        return type == Add || type == Subtract;
-    }
-
-    // static bool isStringIdentifier(std::string_view str) {
-    //     if (str.empty() || !std::isalpha(str[0])) return false;
-    //     for (char c : str) {
-    //         if (!std::isalnum(c) && c != '_') return false;
-    //     }
-    //     return true;
-    // }
-
-    // static bool isStringKeyword(std::string_view str) {
-    //     static const std::string_view keywords[] = {
-    //         "if", "else", "while", "for", "return", "function"
-    //     };
-    //     for (const auto& keyword : keywords) {
-    //         if (str == keyword) return true;
-    //     }
-    //     return false;
-    // }
-
-    // static bool isStringType(std::string_view str) {
-    //     static const std::string_view types[] = {
-    //         "int", "float", "double", "char", "void"
-    //     };
-    //     for (const auto& type : types) {
-    //         if (str == type) return true;
-    //     }
-    //     return false;
-    // }
 };
 
 

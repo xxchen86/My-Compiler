@@ -2,11 +2,11 @@
 #include <optional>
 #include <sstream>
 #include "lexer.h"
-#include "parser.h"
+#include "LL1_parser.h"
 
 int main(int, char**){
     std::istringstream iss;
-    iss.str("1 - (3 + 4) + 5");
+    iss.str("1 - ((3 * 10) + 4 / 1) + 5 * (6+1)");
 
     Lexer lexer(iss);
     LL1Parser parser(lexer);

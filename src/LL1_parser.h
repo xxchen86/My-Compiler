@@ -1,0 +1,76 @@
+#pragma once
+
+
+
+#include "ast.h"
+#include "lexer.h"
+#include <cassert>
+#include <memory>
+
+
+
+/// \brief LL(1) parser for a simple arithmetic expression language.
+/// 
+/// The grammar is:
+///     AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr | AddtiveExpr Subtract MultiplicativeExpr | MultiplicativeExpr
+///     MultiplicativeExpr ::= MultiplicativeExpr Multiply PrimaryExpr | MultiplicativeExpr Divide PrimaryExpr | PrimaryExpr
+///     PrimaryExpr ::= Literal | LeftParen AddtiveExpr RightParen
+class LL1Parser {
+public:
+    LL1Parser(Lexer& lexer) : lexer(lexer) {}
+
+    /// PrimaryExpr ::= Literal | LeftParen AdditiveExpr RightParen
+    std::unique_ptr<ast::Expression> parsePrimaryExpr() {
+        auto token = lexer.getToken();
+        if (token.type == Token::Literal) {
+            return std::make_unique<ast::LiteralExpression>(std::get<int>(token.value));
+        } else if (token.type == Token::LeftParen) {
+            auto ret = parseAddtiveExpr();
+            lexer.getToken();
+            return ret;
+        } else {
+            throw std::runtime_error("Expected Literal or LeftParen");
+        }
+    }
+
+    /// MultiplicativeExpr ::= PrimaryExpr MultiplicativeExprRemainder
+    std::unique_ptr<ast::Expression> parseMultiplicativeExpr() {
+        auto left = parsePrimaryExpr();
+        return parseMultiplicativeExprRemainder(std::move(left));
+    }
+
+    /// MultiplicativeExprRemainder ::= Multiply PrimaryExpr MultiplicativeExprRemainder | Divide PrimaryExpr MultiplicativeExprRemainder | ε
+    std::unique_ptr<ast::Expression> parseMultiplicativeExprRemainder(std::unique_ptr<ast::Expression> left) {
+        auto token = lexer.peekToken();
+        if (token.type != Token::Multiply && token.type != Token::Divide) {
+            return left;
+        }
+        auto op = lexer.getToken();
+        auto right = parsePrimaryExpr();
+        auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
+        return parseMultiplicativeExprRemainder(std::move(expr));
+    }
+
+    /// AdditiveExpr ::= MultiplicativeExpr AdditiveExprRemainder
+    std::unique_ptr<ast::Expression> parseAddtiveExpr() {
+        auto left = parseMultiplicativeExpr();
+        return parseAddtiveExprRemainder(std::move(left));
+    }
+
+    /// AdditiveExprRemainder ::= Add MultiplicativeExpr AdditiveExprRemainder | Subtract MultiplicativeExpr AdditiveExprRemainder | ε
+    std::unique_ptr<ast::Expression> parseAddtiveExprRemainder(std::unique_ptr<ast::Expression> left) {
+        auto token = lexer.peekToken();
+        if (token.type != Token::Add && token.type != Token::Subtract) {
+            return left;
+        }
+        auto op = lexer.getToken();
+        auto right = parseMultiplicativeExpr();
+        auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
+        return parseAddtiveExprRemainder(std::move(expr));
+    }
+
+private:
+    Lexer& lexer;
+};
+
+
