@@ -21,8 +21,12 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # Add test executable
-add_executable(test_gtest tests/test_gtest.cpp)
+aux_source_directory(tests TESTS_LIST)
+add_executable(test_gtest ${TESTS_LIST})
 target_link_libraries(test_gtest gtest gtest_main)
+target_include_directories(test_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
 
 # Add tests
 add_test(NAME test_gtest COMMAND test_gtest)
