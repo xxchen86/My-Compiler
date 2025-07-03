@@ -1,10 +1,18 @@
+module;
+
 #include <iostream>
 #include <optional>
 #include <sstream>
-#include "lexer.h"
-#include "LL1_parser.h"
+
+
+export module main;
+
+import grammar;
+import lexer;
+import ll1_parser;
 
 int main(int, char**){
+    
     std::istringstream iss;
     iss.str("1 - ((3 * 10) + 4 / 1) + 5 * (6+1)");
 

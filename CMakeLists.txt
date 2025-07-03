@@ -1,15 +1,25 @@
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.28.0)
 project(MyCompiler VERSION 0.1.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add Executable
-aux_source_directory(src SRC_LIST)
-add_executable(MyCompiler ${SRC_LIST})
 
+add_executable(MyCompiler)
+target_sources(MyCompiler
+    PRIVATE
+        FILE_SET cxx_modules TYPE CXX_MODULES FILES
+        src/main.cppm
+        src/grammar.cppm
+        src/lexer.cppm
+        src/ll1_parser.cppm
+        src/ast.cppm
+)
 
-# Add Google Test
+enable_testing()
+
+include(GoogleTest)
+
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -17,17 +27,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-# enable GoogleTest
-enable_testing()
-
 # Add test executable
 aux_source_directory(tests TESTS_LIST)
-add_executable(test_gtest ${TESTS_LIST})
-target_link_libraries(test_gtest gtest gtest_main)
-target_include_directories(test_gtest PRIVATE
+add_executable(Tests)
+target_sources(Tests
+    PRIVATE
+        ${TESTS_LIST}
+    PRIVATE
+        FILE_SET cxx_modules TYPE CXX_MODULES FILES
+        src/grammar.cppm
+)
+target_link_libraries(Tests PRIVATE GTest::gtest_main)
+target_include_directories(Tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
-
-# Add tests
-add_test(NAME test_gtest COMMAND test_gtest)
-
+gtest_discover_tests(Tests)

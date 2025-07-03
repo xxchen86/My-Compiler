@@ -1,9 +1,12 @@
-#pragma once
-
+module;
 
 #include <memory>
 #include <ostream>
-namespace ast {
+
+export module ast;
+
+
+export namespace ast {
 
 
 struct Expression {
