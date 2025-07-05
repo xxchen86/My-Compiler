@@ -4,16 +4,13 @@ project(MyCompiler VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+file(GLOB MODULE_FILES src/*.cppm)
 
 add_executable(MyCompiler)
 target_sources(MyCompiler
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/main.cppm
-        src/grammar.cppm
-        src/lexer.cppm
-        src/ll1_parser.cppm
-        src/ast.cppm
+        ${MODULE_FILES}
 )
 
 enable_testing()
@@ -23,7 +20,7 @@ include(GoogleTest)
 include(FetchContent)
 FetchContent_Declare(
     googletest
-    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+    URL file://${CMAKE_SOURCE_DIR}/googletest-release-1.12.1.zip
 )
 FetchContent_MakeAvailable(googletest)
 
@@ -35,7 +32,7 @@ target_sources(Tests
         ${TESTS_LIST}
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/grammar.cppm
+        ${MODULE_FILES}
 )
 target_link_libraries(Tests PRIVATE GTest::gtest_main)
 target_include_directories(Tests PRIVATE
