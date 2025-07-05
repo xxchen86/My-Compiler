@@ -9,6 +9,12 @@ TEST(Production, getRepr) {
     EXPECT_EQ(production.getRepr(), std::string("AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr"));
 }
 
+TEST(Production, ConstructFromString) {
+    Production production1 = {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}};
+    Production production2 = {"AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr"};
+    EXPECT_EQ(production1, production2);
+}
+
 TEST(LR0Item, getRepr1) {
     LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}}, 0};
     EXPECT_EQ(item.getRepr(), std::string("AddtiveExpr ::= . AddtiveExpr Add MultiplicativeExpr"));

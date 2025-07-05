@@ -10,6 +10,8 @@ module;
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 
 export module grammar;
 
@@ -19,13 +21,20 @@ export {
 
   class Production : public StringLike<Production> {
   public:
+    Production(std::string_view s) {
+      std::istringstream iss(s.data());
+      iss >> _head;
+      std::string tmp;
+      iss >> tmp;
+      while (iss >> tmp) {
+        _body.push_back(tmp);
+      }
+      updateRepr();
+    }
+
     Production(std::string head, std::vector<std::string> body)
         : _head(std::move(head)), _body(std::move(body)) {
-      repr = this->_head + " ::=";
-      for (auto &sym : this->_body) {
-        repr += " ";
-        repr += sym;
-      }
+      updateRepr();
     }
 
     std::string_view head() const { return _head; }
@@ -33,6 +42,14 @@ export {
     const std::vector<std::string> &body() const { return _body; }
 
   private:
+    void updateRepr() {
+      repr = this->_head + " ::=";
+      for (auto &sym : this->_body) {
+        repr += " ";
+        repr += sym;
+      }
+    }
+
     std::string _head;
     std::vector<std::string> _body;
   };
