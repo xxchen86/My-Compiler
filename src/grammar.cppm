@@ -1,17 +1,17 @@
 module;
 
+#include <algorithm>
 #include <cstddef>
+#include <iostream>
 #include <optional>
 #include <ranges>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <algorithm>
-#include <iostream>
-#include <sstream>
 
 export module grammar;
 
@@ -117,7 +117,11 @@ export {
 
   class SLRGrammar : public Grammar {
   public:
-    using Grammar::Grammar;
+    SLRGrammar(std::unordered_set<std::string> terminals,
+               std::unordered_set<std::string> nonTerminals,
+               std::unordered_set<Production> productions, Production start)
+        : Grammar(terminals, nonTerminals, productions),
+          start(std::move(start)) {}
 
     auto closure(std::unordered_set<LR0Item> itemSet) {
       auto hasNonTerminalAfterDot = [&](const LR0Item &item) {
@@ -152,7 +156,8 @@ export {
       return itemSet;
     }
 
-    auto GOTO(const std::unordered_set<LR0Item> &itemSet, std::string_view symbol) {
+    auto GOTO(const std::unordered_set<LR0Item> &itemSet,
+              std::string_view symbol) {
       std::unordered_set<LR0Item> kernels;
       for (auto &item : itemSet) {
         if (item.getSymbolAfterDot() == symbol)
@@ -160,5 +165,8 @@ export {
       }
       return closure(std::move(kernels));
     }
+
+  private:
+    Production start;
   };
 }
