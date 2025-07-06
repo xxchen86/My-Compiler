@@ -43,6 +43,56 @@ TEST(LR0Item, getRepr3) {
       std::string("AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr ."));
 }
 
+TEST(LR0Item, canReduce) {
+  LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
+                  3};
+  EXPECT_TRUE(item.canReduce());
+}
+
+TEST(Grammar, FIRST) {
+    Grammar grammar(
+        {"+", "*", "(", ")", "id"},
+        {"E", "T", "EE", "F", "TT"},
+        {
+            {"E", {"T", "EE"}},
+            {"EE", {"+", "T", "EE"}},
+            {"EE", {"Epsilon"}},
+            {"T", {"F", "TT"}},
+            {"TT", {"*", "F", "TT"}},
+            {"TT", {"Epsilon"}},
+            {"F", {"(", "E", ")"}},
+            {"F", {"id", }}
+        },
+        "E"
+    );
+
+    EXPECT_EQ(grammar.FIRST("F"), std::unordered_set<std::string>({"(", "id"}));
+    EXPECT_EQ(grammar.FIRST("TT"), std::unordered_set<std::string>({"*", "Epsilon"}));
+}
+
+TEST(Grammar, FOLLOW) {
+    Grammar grammar(
+        {"+", "*", "(", ")", "id"},
+        {"E", "T", "EE", "F", "TT"},
+        {
+            {"E", {"T", "EE"}},
+            {"EE", {"+", "T", "EE"}},
+            {"EE", {"Epsilon"}},
+            {"T", {"F", "TT"}},
+            {"TT", {"*", "F", "TT"}},
+            {"TT", {"Epsilon"}},
+            {"F", {"(", "E", ")"}},
+            {"F", {"id", }}
+        },
+        "E"
+    );
+
+    auto follow = grammar.FOLLOW();
+    EXPECT_EQ(follow["E"], std::unordered_set<std::string>({")", "$"}));
+    EXPECT_EQ(follow["F"], std::unordered_set<std::string>({"+", "*", ")", "$"}));
+
+}
+
 TEST(SLRGrammar, closure) {
   SLRGrammar grammar(
       {"Add", "Subtract", "Multiply", "Divide", "LeftParen", "RightParen",
@@ -113,4 +163,26 @@ TEST(SLRGrammar, GOTO) {
       {{"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}, 0},
   };
   EXPECT_EQ(nextState, expected);
+}
+
+TEST(SLRGrammar, constructCollectionOfItemSet) {
+      SLRGrammar grammar(
+      {"Add", "Subtract", "Multiply", "Divide", "LeftParen", "RightParen",
+       "Literal"},
+      {"Start", "AddtiveExpr", "MultiplicativeExpr", "PrimaryExpr"},
+      {{"Start", {"AddtiveExpr"}},
+       {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
+       {"AddtiveExpr", {"AddtiveExpr", "Subtract", "MultiplicativeExpr"}},
+       {"AddtiveExpr", {"MultiplicativeExpr"}},
+       {"MultiplicativeExpr",
+        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
+       {"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
+       {"MultiplicativeExpr", {"PrimaryExpr"}},
+       {"PrimaryExpr", {"Literal"}},
+       {"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}},
+      {"Start", {"AddtiveExpr"}});
+
+      auto [collection, _] = grammar.constructCollectionOfItemSet();
+      // TODO
+      EXPECT_EQ(std::vector<std::unordered_set<LR0Item>>{}, collection);
 }

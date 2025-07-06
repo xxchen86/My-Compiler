@@ -1,6 +1,8 @@
 module;
 
 #include <algorithm>
+#include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <iostream>
 #include <optional>
@@ -9,6 +11,7 @@ module;
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -53,30 +56,107 @@ export {
     std::string _head;
     std::vector<std::string> _body;
   };
-  static_assert(std::is_move_assignable_v<Production>);
-  static_assert(std::is_move_constructible_v<Production>);
+  static_assert(std::movable<Production>);
 
   class Grammar {
   public:
     std::unordered_set<std::string> terminals;
     std::unordered_set<std::string> nonTerminals;
     std::unordered_set<Production> productions;
+    std::string startSymbol;
 
     Grammar(std::unordered_set<std::string> terminals,
             std::unordered_set<std::string> nonTerminals,
-            std::unordered_set<Production> productions)
-        : terminals(terminals), nonTerminals(nonTerminals),
-          productions(productions) {}
+            std::unordered_set<Production> productions, std::string startSymbol)
+        : terminals(std::move(terminals)),
+          nonTerminals(std::move(nonTerminals)),
+          productions(std::move(productions)),
+          startSymbol(std::move(startSymbol)) {}
 
-    bool isTerminal(std::string_view symbol) {
+    bool isTerminal(std::string_view symbol) const {
       return terminals.contains(symbol.data());
     }
 
-    bool isNonTerminal(std::string_view symbol) {
+    bool isNonTerminal(std::string_view symbol) const {
       return nonTerminals.contains(symbol.data());
     }
 
-  private:
+    std::unordered_set<std::string> FIRST(std::string_view symbol) const {
+      std::unordered_set<std::string> first;
+      if (isTerminal(symbol)) {
+        first.insert(symbol.data());
+      } else {
+        for (auto &production : productions) {
+          if (production.head() != symbol) {
+            continue;
+          } else if (production.body().size() == 1 &&
+                     production.body().front() == "Epsilon") {
+            first.insert("Epsilon");
+          } else {
+            for (auto &y : production.body()) {
+              auto y1First = FIRST(production.body()[0]);
+              first.insert(y1First.begin(), y1First.end());
+              if (!y1First.contains("Epsilon"))
+                break;
+            }
+          }
+        }
+      }
+
+      return first;
+    }
+
+    std::unordered_map<std::string, std::unordered_set<std::string>>
+    FOLLOW() const {
+      std::unordered_map<std::string, std::unordered_set<std::string>> follow;
+      // rule 1
+      follow[startSymbol].insert("$");
+      bool changed;
+      do {
+        changed = false;
+        for (auto &production : productions) {
+          if (!isNonTerminal(production.head()))
+            continue;
+          for (size_t i = 0; i < production.body().size(); ++i) {
+            if (!isNonTerminal(production.body()[i]))
+              continue;
+            if (i != production.body().size() - 1) {
+              auto betaFirst = FIRST(production.body()[i + 1]);
+              // rule 2
+              for (auto &a : betaFirst) {
+                if (a != "Epsilon" &&
+                    !follow[production.body()[i]].contains(a)) {
+                  follow[production.body()[i]].insert(a);
+                  changed = true;
+                }
+              }
+              // rule3
+              if (betaFirst.contains("Epsilon")) {
+                const auto &headFollow = follow[production.head().data()];
+                if (!headFollow.empty()) {
+                  auto sizeBeforeInsert = follow[production.body()[i]].size();
+                  follow[production.body()[i]].insert(headFollow.begin(),
+                                                      headFollow.end());
+                  auto sizeAfterInsert = follow[production.body()[i]].size();
+                  changed = sizeBeforeInsert != sizeAfterInsert;
+                }
+              }
+            } else {
+              // rule3
+              const auto &headFollow = follow[production.head().data()];
+              if (!headFollow.empty()) {
+                auto sizeBeforeInsert = follow[production.body()[i]].size();
+                follow[production.body()[i]].insert(headFollow.begin(),
+                                                    headFollow.end());
+                auto sizeAfterInsert = follow[production.body()[i]].size();
+                changed = sizeBeforeInsert != sizeAfterInsert;
+              }
+            }
+          }
+        }
+      } while (changed);
+      return follow;
+    }
   };
 
   class LR0Item : public StringLike<LR0Item> {
@@ -108,22 +188,50 @@ export {
 
     size_t dotPosition() const { return _dotPosition; }
 
+    bool canReduce() const { return _dotPosition == _production.body().size(); }
+
   private:
     Production _production;
     size_t _dotPosition;
   };
-  static_assert(std::is_move_assignable_v<LR0Item>);
-  static_assert(std::is_move_constructible_v<LR0Item>);
+  static_assert(std::movable<LR0Item>);
 
-  class SLRGrammar : public Grammar {
+  template <> struct std::hash<std::pair<size_t, std::string>> {
+    size_t operator()(const std::pair<size_t, std::string> &p) const {
+      return std::hash<size_t>()(p.first) ^ std::hash<std::string>()(p.second);
+    }
+  };
+
+  template <typename Item> class LRGrammar : public Grammar {
   public:
-    SLRGrammar(std::unordered_set<std::string> terminals,
-               std::unordered_set<std::string> nonTerminals,
-               std::unordered_set<Production> productions, Production start)
-        : Grammar(terminals, nonTerminals, productions),
-          start(std::move(start)) {}
+    LRGrammar(std::unordered_set<std::string> terminals,
+              std::unordered_set<std::string> nonTerminals,
+              std::unordered_set<Production> productions,
+              Production startProduction)
+        : Grammar(std::move(terminals), std::move(nonTerminals),
+                  std::move(productions), startProduction.head().data()),
+          startProduction(std::move(startProduction)) {}
 
-    auto closure(std::unordered_set<LR0Item> itemSet) {
+    virtual ~LRGrammar() = default;
+    virtual std::unordered_set<Item>
+    closure(std::unordered_set<Item> itemSet) const = 0;
+    virtual std::unordered_set<Item>
+    GOTO(const std::unordered_set<Item> &itemSet,
+         std::string_view symbol) const = 0;
+    virtual std::pair<
+        std::vector<std::unordered_set<Item>>,
+        std::unordered_map<std::pair<size_t, std::string>, size_t>>
+    constructCollectionOfItemSet() const = 0;
+
+    Production startProduction;
+  };
+
+  class SLRGrammar : public LRGrammar<LR0Item> {
+  public:
+    using LRGrammar::LRGrammar;
+
+    std::unordered_set<LR0Item>
+    closure(std::unordered_set<LR0Item> itemSet) const override {
       auto hasNonTerminalAfterDot = [&](const LR0Item &item) {
         auto hasSym = item.getSymbolAfterDot();
         if (!hasSym)
@@ -156,8 +264,8 @@ export {
       return itemSet;
     }
 
-    auto GOTO(const std::unordered_set<LR0Item> &itemSet,
-              std::string_view symbol) {
+    std::unordered_set<LR0Item> GOTO(const std::unordered_set<LR0Item> &itemSet,
+                                     std::string_view symbol) const override {
       std::unordered_set<LR0Item> kernels;
       for (auto &item : itemSet) {
         if (item.getSymbolAfterDot() == symbol)
@@ -166,7 +274,41 @@ export {
       return closure(std::move(kernels));
     }
 
-  private:
-    Production start;
+    std::pair<std::vector<std::unordered_set<LR0Item>>,
+              std::unordered_map<std::pair<size_t, std::string>, size_t>>
+    constructCollectionOfItemSet() const override {
+      std::vector<std::unordered_set<LR0Item>> collection = {
+          {closure({{startProduction, 0}})}};
+      std::unordered_map<std::pair<size_t, std::string>, size_t> transitions;
+
+      for (size_t i = 0; i < collection.size(); ++i) {
+        for (auto &terminal : terminals) {
+          auto nextItemSet = GOTO(collection[i], terminal);
+          if (nextItemSet.empty())
+            continue;
+          auto nextItemSetIter = std::ranges::find(collection, nextItemSet);
+          if (nextItemSetIter == collection.end()) {
+            transitions[{i, terminal}] = collection.size();
+            collection.push_back(std::move(nextItemSet));
+          } else {
+            transitions[{i, terminal}] = nextItemSetIter - collection.begin();
+          }
+        }
+        for (auto &nonTerminal : nonTerminals) {
+          auto nextItemSet = GOTO(collection[i], nonTerminal);
+          if (nextItemSet.empty())
+            continue;
+          auto nextItemSetIter = std::ranges::find(collection, nextItemSet);
+          if (nextItemSetIter == collection.end()) {
+            transitions[{i, nonTerminal}] = collection.size();
+            collection.push_back(std::move(nextItemSet));
+          } else {
+            transitions[{i, nonTerminal}] =
+                nextItemSetIter - collection.begin();
+          }
+        }
+      }
+      return {std::move(collection), std::move(transitions)};
+    }
   };
 }

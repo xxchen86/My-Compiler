@@ -3,6 +3,8 @@ module;
 #include <istream>
 #include <variant>
 #include <iostream>
+#include <string_view>
+#include <stdexcept>
 
 export module lexer;
 
@@ -23,8 +25,26 @@ export {
             Literal = 256, // Start from 256 to avoid conflicts with char tokens
         };
 
-        Token(Type type, Value value = {})
-            : type(type), value(value) {}
+        std::string str() const {
+            switch (type) {
+            case EndOfFile:
+                return "$";
+            case Add:
+                return "Add";
+            case Subtract:
+                return "Subtract";
+            case Multiply:
+                return "Multiply";
+            case Divide:
+                return "Divide";
+            case LeftParen:
+                return "LeftParen";
+            case RightParen:
+                return "RightParen";
+            case Literal:
+                return "Literal";
+            }
+        }
 
         Type type;
         Value value;
@@ -36,11 +56,14 @@ export {
         Lexer(std::istream& in) : in(in), bufferedToken(readToken()) {}
 
         Token getToken() {
+            if (noTokenAnymore)
+                throw std::runtime_error("no token anymore");
             if (bufferedToken.type != EOF) {
                 auto ret = bufferedToken;
                 bufferedToken = readToken();
                 return ret;
             } else {
+                noTokenAnymore = true;
                 return bufferedToken;
             }
         }
@@ -67,6 +90,7 @@ export {
 
         std::istream& in;
         Token bufferedToken;
+        bool noTokenAnymore = false;
     };
 
 }
