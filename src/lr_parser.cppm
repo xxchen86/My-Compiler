@@ -29,7 +29,7 @@ export {
     LRParser(Lexer &lexer, const LRGrammar<Item> &grammar) : lexer(lexer) {}
 
     void constructAction() {
-      auto follow = grammar.FOLLOW();
+      auto follow = grammar.FOLLOW_Table();
       auto [collectionOfItemSet, transitions] =
           grammar.constructCollectionOfItemSet();
       for (auto &[i, sym] : transitions) {
@@ -63,8 +63,18 @@ export {
     SLRParser(Lexer &lexer, const LRGrammar<LR0Item> &grammar)
         : lexer(lexer), grammar(grammar) {}
 
-    void constructTable() {
-      auto follow = grammar.FOLLOW();
+    void buildParser() {
+      auto follow = grammar.FOLLOW_Table();
+
+      // debug
+      for(auto& [k, v] : follow) {
+        std::cout << k << " FOLLOW:" << std::endl;
+        for (auto& s : v) {
+            std::cout << s << " ";
+        }
+        std::cout << std::endl;
+      }
+
       auto [collectionOfItemSet, transitions] =
           grammar.constructCollectionOfItemSet();
         
@@ -86,7 +96,7 @@ export {
         auto i = k.first;
         const auto &sym = k.second;
         if (grammar.isTerminal(sym))
-          actions[{i, sym}] = {Action::Shift, transitions[{i, sym}]};
+          ACTION[{i, sym}] = {Action::Shift, transitions[{i, sym}]};
         else
           GOTO[{i, sym}] = transitions[{i, sym}];
       }
@@ -94,12 +104,12 @@ export {
         for (auto &item : collectionOfItemSet[i]) {
           if (item.canReduce()) {
             for (auto &s : follow[item.production().head().data()]) {
-              actions[{i, s}] = {Action::Reduce, item.production()};
+              ACTION[{i, s}] = {Action::Reduce, item.production()};
             }
           }
         }
         if (collectionOfItemSet[i].contains({grammar.startProduction, 1}))
-          actions[{i, "$"}] = {Action::Accept};
+          ACTION[{i, "$"}] = {Action::Accept};
       }
     }
 
@@ -107,8 +117,8 @@ export {
       stateStack.push(0);
       while (true) {
         auto token = lexer.peekToken();
-        if (actions.contains({stateStack.top(), token.str()})) {
-          auto act = actions[{stateStack.top(), token.str()}];
+        if (ACTION.contains({stateStack.top(), token.str()})) {
+          auto act = ACTION[{stateStack.top(), token.str()}];
           switch (act.type) {
           case Action::Shift:
             lexer.getToken();
@@ -144,7 +154,7 @@ export {
     Lexer &lexer;
     std::stack<size_t> stateStack;
     const LRGrammar<LR0Item> &grammar;
-    std::unordered_map<std::pair<size_t, std::string>, Action> actions;
+    std::unordered_map<std::pair<size_t, std::string>, Action> ACTION;
     std::unordered_map<std::pair<size_t, std::string>, size_t> GOTO;
   };
 }

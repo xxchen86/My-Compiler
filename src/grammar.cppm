@@ -94,7 +94,7 @@ export {
             first.insert("Epsilon");
           } else {
             for (auto &y : production.body()) {
-              auto y1First = FIRST(production.body()[0]);
+              auto y1First = FIRST(y);
               first.insert(y1First.begin(), y1First.end());
               if (!y1First.contains("Epsilon"))
                 break;
@@ -107,7 +107,7 @@ export {
     }
 
     std::unordered_map<std::string, std::unordered_set<std::string>>
-    FOLLOW() const {
+    FOLLOW_Table() const {
       std::unordered_map<std::string, std::unordered_set<std::string>> follow;
       // rule 1
       follow[startSymbol].insert("$");
@@ -122,6 +122,11 @@ export {
               continue;
             if (i != production.body().size() - 1) {
               auto betaFirst = FIRST(production.body()[i + 1]);
+              std::cout << production.body()[i + 1] << " FIRST:" << std::endl;
+              for (auto &s : betaFirst) {
+                std::cout << s << " ";
+              }
+              std::cout << std::endl;
               // rule 2
               for (auto &a : betaFirst) {
                 if (a != "Epsilon" &&
@@ -154,6 +159,14 @@ export {
             }
           }
         }
+        for (auto &[k, v] : follow) {
+          std::cout << k << " FOLLOW:" << std::endl;
+          for (auto &s : v) {
+            std::cout << s << " ";
+          }
+          std::cout << std::endl;
+        }
+        std::cout << "==========" << std::endl;
       } while (changed);
       return follow;
     }

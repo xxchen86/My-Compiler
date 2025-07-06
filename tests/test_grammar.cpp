@@ -87,7 +87,7 @@ TEST(Grammar, FOLLOW) {
         "E"
     );
 
-    auto follow = grammar.FOLLOW();
+    auto follow = grammar.FOLLOW_Table();
     EXPECT_EQ(follow["E"], std::unordered_set<std::string>({")", "$"}));
     EXPECT_EQ(follow["F"], std::unordered_set<std::string>({"+", "*", ")", "$"}));
 
