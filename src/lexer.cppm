@@ -8,34 +8,31 @@ module;
 
 export module lexer;
 
+export import lexer_base;
 import grammar;
-import symbol;
 
 export {
 
-  constexpr Symbol Add(Symbol::Terminal, '+');
-  constexpr Symbol Subtract(Symbol::Terminal, '-');
-  constexpr Symbol Multiply(Symbol::Terminal, '*');
-  constexpr Symbol Divide(Symbol::Terminal, '/');
-  constexpr Symbol LeftParen(Symbol::Terminal, '(');
-  constexpr Symbol RightParen(Symbol::Terminal, ')');
-  constexpr Symbol Literal(Symbol::Terminal, 256);
+  using SymbolType = Symbol<int>;
 
-  struct Token {
-    using Value = std::variant<int>;
+  constexpr SymbolType Add('+', SymbolType::Terminal);
+  constexpr SymbolType Subtract('-', SymbolType::Terminal);
+  constexpr SymbolType Multiply('*', SymbolType::Terminal);
+  constexpr SymbolType Divide('/', SymbolType::Terminal);
+  constexpr SymbolType LeftParen('(', SymbolType::Terminal);
+  constexpr SymbolType RightParen(')', SymbolType::Terminal);
+  constexpr SymbolType Literal(256, SymbolType::Terminal);
 
-    Symbol type;
-    Value value;
-  };
-
-  class Lexer {
+  template <class _TokenType> class Lexer {
   public:
+    using TokenType = _TokenType;
+
     Lexer(std::istream &in) : in(in), bufferedToken(readToken()) {}
 
-    Token getToken() {
+    TokenType getToken() {
       if (noTokenAnymore)
         throw std::runtime_error("no token anymore");
-      if (bufferedToken.type != InputRightEndMarker) {
+      if (bufferedToken.type != TokenType::SymbolType::InputRightEndMarker()) {
         auto ret = bufferedToken;
         bufferedToken = readToken();
         return ret;
@@ -45,10 +42,12 @@ export {
       }
     }
 
-    Token peekToken() { return bufferedToken; }
+    TokenType peekToken() { return bufferedToken; }
+
+    bool eof() { return noTokenAnymore; }
 
   private:
-    Token readToken() {
+    TokenType readToken() {
       char c = in.peek();
       if (c == ' ' || c == '\n' || c == '\t') {
         in.get();
@@ -56,17 +55,17 @@ export {
       } else if (c > '0' && c < '9') {
         int number;
         in >> number;
-        return Token{Literal, number};
+        return {Literal, number};
       } else if (c == EOF) {
-        return Token{InputRightEndMarker};
+        return {TokenType::SymbolType::InputRightEndMarker()};
       } else {
         // a char is treated as a token
-        return Token{Symbol(Symbol::Terminal, in.get())};
+        return {{in.get(), TokenType::SymbolType::Terminal}};
       }
     }
 
     std::istream &in;
-    Token bufferedToken;
+    TokenType bufferedToken;
     bool noTokenAnymore = false;
   };
 }

@@ -14,33 +14,36 @@ import lr_parser;
 
 int main(int, char **) {
 
-  constexpr Symbol Start(Symbol::NonTerminal, 1);
-  constexpr Symbol AddtiveExpr(Symbol::NonTerminal, 2);
-  constexpr Symbol MultiplicativeExpr(Symbol::NonTerminal, 3);
-  constexpr Symbol PrimaryExpr(Symbol::NonTerminal, 4);
+  using SymbolType = Symbol<int>;
+  using ProductionType = Production<SymbolType>;
 
-  std::unordered_set<Symbol> terminals = {
-      Add, Subtract, Multiply, Divide, LeftParen, RightParen, Literal};
-  std::unordered_set<Symbol> nonTerminals = {Start, AddtiveExpr,
-                                             MultiplicativeExpr, PrimaryExpr};
-  std::unordered_set<Production> productions = {
-      {Start, {AddtiveExpr}},
-      {AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}},
-      {AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}},
-      {AddtiveExpr, {MultiplicativeExpr}},
-      {MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}},
-      {MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}},
-      {MultiplicativeExpr, {PrimaryExpr}},
-      {PrimaryExpr, {Literal}},
-      {PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}};
-  SLRGrammar grammar({terminals, nonTerminals, productions, Start},
-                     {Start, {AddtiveExpr}});
+  constexpr SymbolType Start{1, SymbolType::NonTerminal};
+  constexpr SymbolType AddtiveExpr{2, SymbolType::NonTerminal};
+  constexpr SymbolType MultiplicativeExpr{3, SymbolType::NonTerminal};
+  constexpr SymbolType PrimaryExpr{4, SymbolType::NonTerminal};
+
+  Grammar basicGrammar{
+      {Add, Subtract, Multiply, Divide, LeftParen, RightParen, Literal},
+      {Start, AddtiveExpr, MultiplicativeExpr, PrimaryExpr},
+      {{Start, {AddtiveExpr}},
+       {AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}},
+       {AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}},
+       {AddtiveExpr, {MultiplicativeExpr}},
+       {MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}},
+       {MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}},
+       {MultiplicativeExpr, {PrimaryExpr}},
+       {PrimaryExpr, {Literal}},
+       {PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}},
+      Start};
+
+  SLRGrammar grammar{std::move(basicGrammar), {Start, {AddtiveExpr}}};
 
   std::istringstream iss;
   iss.str("1 - ((3 * 10) + 4 / 1) + 5 * (6+1)");
-//   iss.str("1");
 
-  Lexer lexer(iss);
+  using TokenType = Token<SymbolType, int>;
+  Lexer<TokenType> lexer(iss);
+
   SLRParser parser(lexer, grammar);
   parser.buildParser();
   parser.parse();

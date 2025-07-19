@@ -14,22 +14,25 @@ module;
 
 export module lr_parser;
 
-import lexer;
+import lexer_base;
 import grammar;
-import symbol;
 
 export {
-  struct Action {
-    enum Type { Shift, Reduce, Accept, Error };
-    Type type;
-    std::variant<size_t, Production> value;
-  };
 
-  class SLRParser {
+  template <LexerTypeTrait LexerType, class GrammarType> class SLRParser {
   public:
-    using State = SLRGrammar::State;
+    using StateType = GrammarType::StateType;
+    using SymbolType = GrammarType::SymbolType;
+    using ProductionType = GrammarType::ProductionType;
+    using LR0ItemType = GrammarType::LR0ItemType;
 
-    SLRParser(Lexer &lexer, const SLRGrammar &grammar)
+    struct Action {
+      enum Type { Shift, Reduce, Accept, Error };
+      Type type;
+      std::variant<size_t, ProductionType> value;
+    };
+
+    SLRParser(LexerType &lexer, const GrammarType &grammar)
         : lexer(lexer), grammar(grammar) {}
 
     void buildParser() {
@@ -39,7 +42,7 @@ export {
       for (auto &[k, v] : transitions) {
         auto i = k.first;
         const auto &sym = k.second;
-        if (sym.type == Symbol::Terminal)
+        if (sym.type == SymbolType::Terminal)
           ACTION[{i, sym}] = {Action::Shift, transitions[{i, sym}]};
         else
           GOTO[{i, sym}] = transitions[{i, sym}];
@@ -53,7 +56,7 @@ export {
           }
         }
         if (collectionOfItemSet[i].contains({grammar.augmentedProduction, 1}))
-          ACTION[{i, InputRightEndMarker}] = {Action::Accept};
+          ACTION[{i, SymbolType::InputRightEndMarker()}] = {Action::Accept};
       }
     }
 
@@ -71,14 +74,13 @@ export {
                       << std::endl;
             break;
           case Action::Reduce:
-            for (auto i = 0; i < std::get<Production>(act.value).body.size();
-                 ++i) {
+            for (auto i = 0;
+                 i < std::get<ProductionType>(act.value).body.size(); ++i) {
               stateStack.pop();
             }
-            stateStack.push(
-                GOTO[{stateStack.top(),
-                      std::get<Production>(act.value).head}]);
-            std::cout << "reduce" << std::get<Production>(act.value)
+            stateStack.push(GOTO[{stateStack.top(),
+                                  std::get<ProductionType>(act.value).head}]);
+            std::cout << "reduce" << std::get<ProductionType>(act.value)
                       << " current state: " << stateStack.top() << std::endl;
             break;
           case Action::Accept:
@@ -95,10 +97,10 @@ export {
     }
 
   public: // TODO: for debug
-    Lexer &lexer;
-    std::stack<State> stateStack;
-    const SLRGrammar &grammar;
-    std::unordered_map<std::pair<State, Symbol>, Action> ACTION;
-    std::unordered_map<std::pair<State, Symbol>, State> GOTO;
+    LexerType &lexer;
+    std::stack<StateType> stateStack;
+    const GrammarType &grammar;
+    std::unordered_map<std::pair<StateType, SymbolType>, Action> ACTION;
+    std::unordered_map<std::pair<StateType, SymbolType>, StateType> GOTO;
   };
 }
