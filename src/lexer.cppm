@@ -1,96 +1,71 @@
 module;
 
-#include <istream>
-#include <variant>
 #include <iostream>
-#include <string_view>
+#include <istream>
 #include <stdexcept>
+#include <string_view>
+#include <variant>
 
 export module lexer;
 
+import grammar;
+
 export {
 
-    struct Token {
-        using Value = std::variant<int>;
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Subtract(Symbol::Terminal, '-');
+  constexpr Symbol Multiply(Symbol::Terminal, '*');
+  constexpr Symbol Divide(Symbol::Terminal, '/');
+  constexpr Symbol LeftParen(Symbol::Terminal, '(');
+  constexpr Symbol RightParen(Symbol::Terminal, ')');
+  constexpr Symbol Literal(Symbol::Terminal, 256);
 
-        enum Type: int {
-            EndOfFile = EOF,
-            Add = '+',
-            Subtract = '-',
-            Multiply = '*',
-            Divide = '/',
-            LeftParen = '(',
-            RightParen = ')',
+  struct Token {
+    using Value = std::variant<int>;
 
-            Literal = 256, // Start from 256 to avoid conflicts with char tokens
-        };
+    Symbol type;
+    Value value;
+  };
 
-        std::string str() const {
-            switch (type) {
-            case EndOfFile:
-                return "$";
-            case Add:
-                return "Add";
-            case Subtract:
-                return "Subtract";
-            case Multiply:
-                return "Multiply";
-            case Divide:
-                return "Divide";
-            case LeftParen:
-                return "LeftParen";
-            case RightParen:
-                return "RightParen";
-            case Literal:
-                return "Literal";
-            }
-        }
+  class Lexer {
+  public:
+    Lexer(std::istream &in) : in(in), bufferedToken(readToken()) {}
 
-        Type type;
-        Value value;
-    };
+    Token getToken() {
+      if (noTokenAnymore)
+        throw std::runtime_error("no token anymore");
+      if (bufferedToken.type != InputRightEndMarker) {
+        auto ret = bufferedToken;
+        bufferedToken = readToken();
+        return ret;
+      } else {
+        noTokenAnymore = true;
+        return bufferedToken;
+      }
+    }
 
+    Token peekToken() { return bufferedToken; }
 
-    class Lexer {
-    public:
-        Lexer(std::istream& in) : in(in), bufferedToken(readToken()) {}
+  private:
+    Token readToken() {
+      char c = in.peek();
+      if (c == ' ' || c == '\n' || c == '\t') {
+        in.get();
+        return readToken();
+      } else if (c > '0' && c < '9') {
+        int number;
+        in >> number;
+        return Token{Literal, number};
+      } else if (c == EOF) {
+        return Token{InputRightEndMarker};
+      } else {
+        // a char is treated as a token
+        return Token{Symbol(Symbol::Terminal, in.get())};
+      }
+    }
 
-        Token getToken() {
-            if (noTokenAnymore)
-                throw std::runtime_error("no token anymore");
-            if (bufferedToken.type != EOF) {
-                auto ret = bufferedToken;
-                bufferedToken = readToken();
-                return ret;
-            } else {
-                noTokenAnymore = true;
-                return bufferedToken;
-            }
-        }
-
-        Token peekToken() {
-            return bufferedToken;
-        }
-
-    private:
-        Token readToken() {
-            char c = in.peek();
-            if (c == ' ' || c == '\n' || c == '\t') {
-                in.get();
-                return readToken();
-            } else if (c > '0' && c < '9') {
-                int number;
-                in >> number;
-                return Token{Token::Type::Literal, number};
-            } else {
-                // a char is treated as a token
-                return Token{Token::Type(in.get())};
-            }
-        }
-
-        std::istream& in;
-        Token bufferedToken;
-        bool noTokenAnymore = false;
-    };
-
+    std::istream &in;
+    Token bufferedToken;
+    bool noTokenAnymore = false;
+  };
 }

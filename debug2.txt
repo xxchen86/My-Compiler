@@ -1,0 +1,214 @@
+State 0
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=1} .body=[Symbol{.type=1 .id=2}, ]} .dotPosition=0}
+when Symbol{.type=1 .id=2} goto State 5
+when Symbol{.type=1 .id=3} goto State 4
+when Symbol{.type=1 .id=4} goto State 3
+when Symbol{.type=0 .id=40} goto State 2
+when Symbol{.type=0 .id=256} goto State 1
+
+State 1
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=1}
+
+State 2
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=3}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=1}
+when Symbol{.type=1 .id=3} goto State 4
+when Symbol{.type=1 .id=4} goto State 3
+when Symbol{.type=0 .id=256} goto State 1
+when Symbol{.type=0 .id=40} goto State 2
+when Symbol{.type=1 .id=2} goto State 6
+
+State 3
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+
+State 4
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=3}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+when Symbol{.type=0 .id=47} goto State 7
+when Symbol{.type=0 .id=42} goto State 8
+
+State 5
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=1} .body=[Symbol{.type=1 .id=2}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=1}
+when Symbol{.type=0 .id=43} goto State 10
+when Symbol{.type=0 .id=45} goto State 9
+
+State 6
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=2}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=1}
+when Symbol{.type=0 .id=45} goto State 9
+when Symbol{.type=0 .id=41} goto State 11
+when Symbol{.type=0 .id=43} goto State 10
+
+State 7
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=2}
+when Symbol{.type=0 .id=256} goto State 1
+when Symbol{.type=1 .id=4} goto State 12
+when Symbol{.type=0 .id=40} goto State 2
+
+State 8
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=2}
+when Symbol{.type=1 .id=4} goto State 13
+when Symbol{.type=0 .id=256} goto State 1
+when Symbol{.type=0 .id=40} goto State 2
+
+State 9
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=2}
+when Symbol{.type=1 .id=3} goto State 14
+when Symbol{.type=0 .id=256} goto State 1
+when Symbol{.type=0 .id=40} goto State 2
+when Symbol{.type=1 .id=4} goto State 3
+
+State 10
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=256}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=0}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=2}
+when Symbol{.type=1 .id=3} goto State 15
+when Symbol{.type=1 .id=4} goto State 3
+when Symbol{.type=0 .id=256} goto State 1
+when Symbol{.type=0 .id=40} goto State 2
+
+State 11
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=4} .body=[Symbol{.type=0 .id=40}, Symbol{.type=1 .id=2}, Symbol{.type=0 .id=41}, ]} .dotPosition=3}
+
+State 12
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=3}
+
+State 13
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=3}
+
+State 14
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=45}, Symbol{.type=1 .id=3}, ]} .dotPosition=3}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+when Symbol{.type=0 .id=42} goto State 8
+when Symbol{.type=0 .id=47} goto State 7
+
+State 15
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=2} .body=[Symbol{.type=1 .id=2}, Symbol{.type=0 .id=43}, Symbol{.type=1 .id=3}, ]} .dotPosition=3}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=42}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+LR0Item{.production=Production{.head=Symbol{.type=1 .id=3} .body=[Symbol{.type=1 .id=3}, Symbol{.type=0 .id=47}, Symbol{.type=1 .id=4}, ]} .dotPosition=1}
+when Symbol{.type=0 .id=42} goto State 8
+when Symbol{.type=0 .id=47} goto State 7
+
+
+
+
+
+
+
+
+Symbol{.type=1 .id=2} FOLLOW:
+Symbol{.type=2 .id=1} Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} 
+Symbol{.type=1 .id=3} FOLLOW:
+Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} Symbol{.type=2 .id=1} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=4} FOLLOW:
+Symbol{.type=0 .id=41} Symbol{.type=0 .id=45} Symbol{.type=0 .id=43} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=1} FOLLOW:
+Symbol{.type=2 .id=1}
+
+
+
+
+
+Symbol{.type=0 .id=47} FIRST:
+Symbol{.type=0 .id=47} 
+Symbol{.type=0 .id=42} FIRST:
+Symbol{.type=0 .id=42} 
+Symbol{.type=0 .id=41} FIRST:
+Symbol{.type=0 .id=41} 
+Symbol{.type=0 .id=45} FIRST:
+Symbol{.type=0 .id=45} 
+Symbol{.type=0 .id=43} FIRST:
+Symbol{.type=0 .id=43} 
+
+
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Subtract(Symbol::Terminal, '-');
+  constexpr Symbol Multiply(Symbol::Terminal, '*');
+  constexpr Symbol Divide(Symbol::Terminal, '/');
+  constexpr Symbol LeftParen(Symbol::Terminal, '(');
+  constexpr Symbol RightParen(Symbol::Terminal, ')');
+  constexpr Symbol Literal(Symbol::Terminal, 256);
+  
+  constexpr Symbol Start(Symbol::NonTerminal, 1);
+  constexpr Symbol AddtiveExpr(Symbol::NonTerminal, 2);
+  constexpr Symbol MultiplicativeExpr(Symbol::NonTerminal, 3);
+  constexpr Symbol PrimaryExpr(Symbol::NonTerminal, 4);
+
+Symbol{.type=0 .id=47} FIRST:
+Symbol{.type=0 .id=47} 
+Symbol{.type=0 .id=42} FIRST:
+Symbol{.type=0 .id=42} 
+Symbol{.type=0 .id=41} FIRST:
+Symbol{.type=0 .id=41} 
+Symbol{.type=0 .id=45} FIRST:
+Symbol{.type=0 .id=45} 
+Symbol{.type=0 .id=43} FIRST:
+Symbol{.type=0 .id=43} 
+Symbol{.type=1 .id=2} FOLLOW:
+Symbol{.type=2 .id=1} Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} 
+Symbol{.type=1 .id=4} FOLLOW:
+Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=3} FOLLOW:
+Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=1} FOLLOW:
+Symbol{.type=2 .id=1} 
+==========
+Symbol{.type=0 .id=47} FIRST:
+Symbol{.type=0 .id=47} 
+Symbol{.type=0 .id=42} FIRST:
+Symbol{.type=0 .id=42} 
+Symbol{.type=0 .id=41} FIRST:
+Symbol{.type=0 .id=41} 
+Symbol{.type=0 .id=45} FIRST:
+Symbol{.type=0 .id=45} 
+Symbol{.type=0 .id=43} FIRST:
+Symbol{.type=0 .id=43} 
+Symbol{.type=1 .id=2} FOLLOW:
+Symbol{.type=2 .id=1} Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} 
+Symbol{.type=1 .id=4} FOLLOW:
+Symbol{.type=0 .id=41} Symbol{.type=0 .id=45} Symbol{.type=0 .id=43} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=3} FOLLOW:
+Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} Symbol{.type=2 .id=1} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=1} FOLLOW:
+Symbol{.type=2 .id=1} 
+==========
+Symbol{.type=1 .id=2} FOLLOW:
+Symbol{.type=2 .id=1} Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} 
+Symbol{.type=1 .id=4} FOLLOW:
+Symbol{.type=0 .id=41} Symbol{.type=0 .id=45} Symbol{.type=0 .id=43} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=3} FOLLOW:
+Symbol{.type=0 .id=43} Symbol{.type=0 .id=45} Symbol{.type=0 .id=41} Symbol{.type=2 .id=1} Symbol{.type=0 .id=42} Symbol{.type=0 .id=47} 
+Symbol{.type=1 .id=1} FOLLOW:
+Symbol{.type=2 .id=1} 

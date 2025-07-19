@@ -1,0 +1,196 @@
+State 0
+PrimaryExpr ::= . Literal
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= . MultiplicativeExpr Divide PrimaryExpr
+MultiplicativeExpr ::= . PrimaryExpr
+MultiplicativeExpr ::= . MultiplicativeExpr Multiply PrimaryExpr
+AddtiveExpr ::= . MultiplicativeExpr
+AddtiveExpr ::= . AddtiveExpr Add MultiplicativeExpr
+AddtiveExpr ::= . AddtiveExpr Subtract MultiplicativeExpr
+Start ::= . AddtiveExpr
+when AddtiveExpr goto State 5
+when MultiplicativeExpr goto State 4
+when LeftParen goto State 2
+when PrimaryExpr goto State 3
+when Literal goto State 1
+
+State 1
+PrimaryExpr ::= Literal .
+
+State 2
+PrimaryExpr ::= . Literal
+MultiplicativeExpr ::= . PrimaryExpr
+MultiplicativeExpr ::= . MultiplicativeExpr Multiply PrimaryExpr
+AddtiveExpr ::= . MultiplicativeExpr
+AddtiveExpr ::= . AddtiveExpr Add MultiplicativeExpr
+AddtiveExpr ::= . AddtiveExpr Subtract MultiplicativeExpr
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= . MultiplicativeExpr Divide PrimaryExpr
+PrimaryExpr ::= LeftParen . AddtiveExpr RightParen
+when PrimaryExpr goto State 3
+when LeftParen goto State 2
+when MultiplicativeExpr goto State 4
+when Literal goto State 1
+when AddtiveExpr goto State 6
+
+State 3
+MultiplicativeExpr ::= PrimaryExpr .
+
+State 4
+AddtiveExpr ::= MultiplicativeExpr .
+MultiplicativeExpr ::= MultiplicativeExpr . Multiply PrimaryExpr
+MultiplicativeExpr ::= MultiplicativeExpr . Divide PrimaryExpr
+when Divide goto State 7
+when Multiply goto State 8
+
+State 5
+AddtiveExpr ::= AddtiveExpr . Subtract MultiplicativeExpr
+Start ::= AddtiveExpr .
+AddtiveExpr ::= AddtiveExpr . Add MultiplicativeExpr
+when Subtract goto State 9
+when Add goto State 10
+
+State 6
+AddtiveExpr ::= AddtiveExpr . Subtract MultiplicativeExpr
+PrimaryExpr ::= LeftParen AddtiveExpr . RightParen
+AddtiveExpr ::= AddtiveExpr . Add MultiplicativeExpr
+when RightParen goto State 11
+when Subtract goto State 9
+when Add goto State 10
+
+State 7
+PrimaryExpr ::= . Literal
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= MultiplicativeExpr Divide . PrimaryExpr
+when Literal goto State 1
+when LeftParen goto State 2
+when PrimaryExpr goto State 12
+
+State 8
+PrimaryExpr ::= . Literal
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= MultiplicativeExpr Multiply . PrimaryExpr
+when PrimaryExpr goto State 13
+when LeftParen goto State 2
+when Literal goto State 1
+
+State 9
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= . MultiplicativeExpr Divide PrimaryExpr
+MultiplicativeExpr ::= . MultiplicativeExpr Multiply PrimaryExpr
+MultiplicativeExpr ::= . PrimaryExpr
+PrimaryExpr ::= . Literal
+AddtiveExpr ::= AddtiveExpr Subtract . MultiplicativeExpr
+when PrimaryExpr goto State 3
+when Literal goto State 1
+when LeftParen goto State 2
+when MultiplicativeExpr goto State 14
+
+State 10
+PrimaryExpr ::= . Literal
+PrimaryExpr ::= . LeftParen AddtiveExpr RightParen
+MultiplicativeExpr ::= . MultiplicativeExpr Divide PrimaryExpr
+MultiplicativeExpr ::= . MultiplicativeExpr Multiply PrimaryExpr
+MultiplicativeExpr ::= . PrimaryExpr
+AddtiveExpr ::= AddtiveExpr Add . MultiplicativeExpr
+when MultiplicativeExpr goto State 15
+when PrimaryExpr goto State 3
+when Literal goto State 1
+when LeftParen goto State 2
+
+State 11
+PrimaryExpr ::= LeftParen AddtiveExpr RightParen .
+
+State 12
+MultiplicativeExpr ::= MultiplicativeExpr Divide PrimaryExpr .
+
+State 13
+MultiplicativeExpr ::= MultiplicativeExpr Multiply PrimaryExpr .
+
+State 14
+AddtiveExpr ::= AddtiveExpr Subtract MultiplicativeExpr .
+MultiplicativeExpr ::= MultiplicativeExpr . Multiply PrimaryExpr
+MultiplicativeExpr ::= MultiplicativeExpr . Divide PrimaryExpr
+when Divide goto State 7
+when Multiply goto State 8
+
+State 15
+AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr .
+MultiplicativeExpr ::= MultiplicativeExpr . Multiply PrimaryExpr
+MultiplicativeExpr ::= MultiplicativeExpr . Divide PrimaryExpr
+when Multiply goto State 8
+when Divide goto State 7
+
+
+
+
+PrimaryExpr FOLLOW:
+$ Subtract RightParen Add Divide Multiply 
+MultiplicativeExpr FOLLOW:
+$ Divide Add RightParen Subtract Multiply 
+AddtiveExpr FOLLOW:
+$ Add Subtract RightParen 
+Start FOLLOW:
+$ 
+
+
+
+RightParen FIRST:
+RightParen 
+Multiply FIRST:
+Multiply 
+Subtract FIRST:
+Subtract 
+Add FIRST:
+Add 
+Divide FIRST:
+Divide 
+
+
+
+RightParen FIRST:
+RightParen 
+Multiply FIRST:
+Multiply 
+Subtract FIRST:
+Subtract 
+Add FIRST:
+Add 
+Divide FIRST:
+Divide 
+PrimaryExpr FOLLOW:
+Subtract RightParen Add Divide Multiply 
+MultiplicativeExpr FOLLOW:
+Divide Add RightParen Subtract Multiply 
+AddtiveExpr FOLLOW:
+$ Add Subtract RightParen 
+Start FOLLOW:
+$ 
+==========
+RightParen FIRST:
+RightParen 
+Multiply FIRST:
+Multiply 
+Subtract FIRST:
+Subtract 
+Add FIRST:
+Add 
+Divide FIRST:
+Divide 
+PrimaryExpr FOLLOW:
+$ Subtract RightParen Add Divide Multiply 
+MultiplicativeExpr FOLLOW:
+$ Divide Add RightParen Subtract Multiply 
+AddtiveExpr FOLLOW:
+$ Add Subtract RightParen 
+Start FOLLOW:
+$ 
+==========
+PrimaryExpr FOLLOW:
+$ Subtract RightParen Add Divide Multiply 
+MultiplicativeExpr FOLLOW:
+$ Divide Add RightParen Subtract Multiply 
+AddtiveExpr FOLLOW:
+$ Add Subtract RightParen 
+Start FOLLOW:
+$ 

@@ -4,185 +4,181 @@
 
 import grammar;
 
-TEST(Production, getRepr) {
-  Production production = {"AddtiveExpr",
-                           {"AddtiveExpr", "Add", "MultiplicativeExpr"}};
-  EXPECT_EQ(production.getRepr(),
-            std::string("AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr"));
+TEST(Grammar2, FIRST) {
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Mul(Symbol::Terminal, '*');
+  constexpr Symbol LP(Symbol::Terminal, '(');
+  constexpr Symbol RP(Symbol::Terminal, ')');
+  constexpr Symbol Id(Symbol::Terminal, 256);
+
+  constexpr Symbol E(Symbol::NonTerminal, 1);
+  constexpr Symbol T(Symbol::NonTerminal, 2);
+  constexpr Symbol EE(Symbol::NonTerminal, 3);
+  constexpr Symbol F(Symbol::NonTerminal, 4);
+  constexpr Symbol TT(Symbol::NonTerminal, 5);
+
+  Grammar grammar({Add, Mul, LP, RP, Id}, {E, T, EE, F, TT},
+                  {{E, {T, EE}},
+                   {EE, {Add, T, EE}},
+                   {EE, {Epsilon}},
+                   {T, {F, TT}},
+                   {TT, {Mul, F, TT}},
+                   {TT, {Epsilon}},
+                   {F, {LP, E, RP}},
+                   {F, {Id}}},
+                  E);
+
+  EXPECT_EQ(grammar.FIRST(F), std::unordered_set<Symbol>({LP, Id}));
+  EXPECT_EQ(grammar.FIRST(TT), std::unordered_set<Symbol>({Mul, Epsilon}));
 }
 
-TEST(Production, ConstructFromString) {
-  Production production1 = {"AddtiveExpr",
-                            {"AddtiveExpr", "Add", "MultiplicativeExpr"}};
-  Production production2 = {
-      "AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr"};
-  EXPECT_EQ(production1, production2);
+TEST(Grammar2, FOLLOW) {
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Mul(Symbol::Terminal, '*');
+  constexpr Symbol LP(Symbol::Terminal, '(');
+  constexpr Symbol RP(Symbol::Terminal, ')');
+  constexpr Symbol Id(Symbol::Terminal, 256);
+
+  constexpr Symbol E(Symbol::NonTerminal, 1);
+  constexpr Symbol T(Symbol::NonTerminal, 2);
+  constexpr Symbol EE(Symbol::NonTerminal, 3);
+  constexpr Symbol F(Symbol::NonTerminal, 4);
+  constexpr Symbol TT(Symbol::NonTerminal, 5);
+
+  Grammar grammar({Add, Mul, LP, RP, Id}, {E, T, EE, F, TT},
+                  {{E, {T, EE}},
+                   {EE, {Add, T, EE}},
+                   {EE, {Epsilon}},
+                   {T, {F, TT}},
+                   {TT, {Mul, F, TT}},
+                   {TT, {Epsilon}},
+                   {F, {LP, E, RP}},
+                   {F, {Id}}},
+                  E);
+
+  auto follow = grammar.FOLLOW_Table();
+  EXPECT_EQ(follow[E], std::unordered_set<Symbol>({RP, InputRightEndMarker}));
+  EXPECT_EQ(follow[F],
+            std::unordered_set<Symbol>({Add, Mul, RP, InputRightEndMarker}));
 }
 
-TEST(LR0Item, getRepr1) {
-  LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-                  0};
-  EXPECT_EQ(
-      item.getRepr(),
-      std::string("AddtiveExpr ::= . AddtiveExpr Add MultiplicativeExpr"));
-}
+TEST(SLRGrammar2, CLOSURE) {
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Subtract(Symbol::Terminal, '-');
+  constexpr Symbol Multiply(Symbol::Terminal, '*');
+  constexpr Symbol Divide(Symbol::Terminal, '/');
+  constexpr Symbol LeftParen(Symbol::Terminal, '(');
+  constexpr Symbol RightParen(Symbol::Terminal, ')');
+  constexpr Symbol Literal(Symbol::Terminal, 256);
 
-TEST(LR0Item, getRepr2) {
-  LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-                  1};
-  EXPECT_EQ(
-      item.getRepr(),
-      std::string("AddtiveExpr ::= AddtiveExpr . Add MultiplicativeExpr"));
-}
+  constexpr Symbol Start(Symbol::NonTerminal, 1);
+  constexpr Symbol AddtiveExpr(Symbol::NonTerminal, 2);
+  constexpr Symbol MultiplicativeExpr(Symbol::NonTerminal, 3);
+  constexpr Symbol PrimaryExpr(Symbol::NonTerminal, 4);
 
-TEST(LR0Item, getRepr3) {
-  LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-                  3};
-  EXPECT_EQ(
-      item.getRepr(),
-      std::string("AddtiveExpr ::= AddtiveExpr Add MultiplicativeExpr ."));
-}
-
-TEST(LR0Item, canReduce) {
-  LR0Item item = {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-                  3};
-  EXPECT_TRUE(item.canReduce());
-}
-
-TEST(Grammar, FIRST) {
-    Grammar grammar(
-        {"+", "*", "(", ")", "id"},
-        {"E", "T", "EE", "F", "TT"},
-        {
-            {"E", {"T", "EE"}},
-            {"EE", {"+", "T", "EE"}},
-            {"EE", {"Epsilon"}},
-            {"T", {"F", "TT"}},
-            {"TT", {"*", "F", "TT"}},
-            {"TT", {"Epsilon"}},
-            {"F", {"(", "E", ")"}},
-            {"F", {"id", }}
-        },
-        "E"
-    );
-
-    EXPECT_EQ(grammar.FIRST("F"), std::unordered_set<std::string>({"(", "id"}));
-    EXPECT_EQ(grammar.FIRST("TT"), std::unordered_set<std::string>({"*", "Epsilon"}));
-}
-
-TEST(Grammar, FOLLOW) {
-    Grammar grammar(
-        {"+", "*", "(", ")", "id"},
-        {"E", "T", "EE", "F", "TT"},
-        {
-            {"E", {"T", "EE"}},
-            {"EE", {"+", "T", "EE"}},
-            {"EE", {"Epsilon"}},
-            {"T", {"F", "TT"}},
-            {"TT", {"*", "F", "TT"}},
-            {"TT", {"Epsilon"}},
-            {"F", {"(", "E", ")"}},
-            {"F", {"id", }}
-        },
-        "E"
-    );
-
-    auto follow = grammar.FOLLOW_Table();
-    EXPECT_EQ(follow["E"], std::unordered_set<std::string>({")", "$"}));
-    EXPECT_EQ(follow["F"], std::unordered_set<std::string>({"+", "*", ")", "$"}));
-
-}
-
-TEST(SLRGrammar, closure) {
   SLRGrammar grammar(
-      {"Add", "Subtract", "Multiply", "Divide", "LeftParen", "RightParen",
-       "Literal"},
-      {"Start", "AddtiveExpr", "MultiplicativeExpr", "PrimaryExpr"},
-      {{"Start", {"AddtiveExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Subtract", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"MultiplicativeExpr"}},
-       {"MultiplicativeExpr",
-        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"PrimaryExpr"}},
-       {"PrimaryExpr", {"Literal"}},
-       {"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}},
-      {"Start", {"AddtiveExpr"}});
+      {{Add, Subtract, Multiply, Divide, LeftParen, RightParen, Literal},
+       {Start, AddtiveExpr, MultiplicativeExpr, PrimaryExpr},
+       {{Start, {AddtiveExpr}},
+        {AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}},
+        {AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}},
+        {AddtiveExpr, {MultiplicativeExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}},
+        {MultiplicativeExpr, {PrimaryExpr}},
+        {PrimaryExpr, {Literal}},
+        {PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}}},
+      {Start, {AddtiveExpr}});
 
-  auto closure = grammar.closure({LR0Item(
-      {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}}, 0)});
+  auto closure = grammar.CLOSURE(
+      {LR0Item({AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}}, 0)});
 
   std::unordered_set<LR0Item> expected = {
-      {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}}, 0},
-      {{"AddtiveExpr", {"AddtiveExpr", "Subtract", "MultiplicativeExpr"}}, 0},
-      {{"AddtiveExpr", {"MultiplicativeExpr"}}, 0},
-      {{"MultiplicativeExpr",
-        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
-       0},
-      {{"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
-       0},
-      {{"MultiplicativeExpr", {"PrimaryExpr"}}, 0},
-      {{"PrimaryExpr", {"Literal"}}, 0},
-      {{"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}, 0},
+      {{AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}}, 0},
+      {{AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}}, 0},
+      {{AddtiveExpr, {MultiplicativeExpr}}, 0},
+      {{MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}}, 0},
+      {{MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}}, 0},
+      {{MultiplicativeExpr, {PrimaryExpr}}, 0},
+      {{PrimaryExpr, {Literal}}, 0},
+      {{PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}, 0},
   };
   EXPECT_EQ(closure, expected);
 }
 
-TEST(SLRGrammar, GOTO) {
-  SLRGrammar grammar(
-      {"Add", "Subtract", "Multiply", "Divide", "LeftParen", "RightParen",
-       "Literal"},
-      {"Start", "AddtiveExpr", "MultiplicativeExpr", "PrimaryExpr"},
-      {{"Start", {"AddtiveExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Subtract", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"MultiplicativeExpr"}},
-       {"MultiplicativeExpr",
-        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"PrimaryExpr"}},
-       {"PrimaryExpr", {"Literal"}},
-       {"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}},
-      {"Start", {"AddtiveExpr"}});
+TEST(SLRGrammar2, GOTO) {
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Subtract(Symbol::Terminal, '-');
+  constexpr Symbol Multiply(Symbol::Terminal, '*');
+  constexpr Symbol Divide(Symbol::Terminal, '/');
+  constexpr Symbol LeftParen(Symbol::Terminal, '(');
+  constexpr Symbol RightParen(Symbol::Terminal, ')');
+  constexpr Symbol Literal(Symbol::Terminal, 256);
 
-  auto nextState = grammar.GOTO(
-      {{{"Start", {"AddtiveExpr"}}, 1},
-       {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}}, 1}},
-      "Add");
+  constexpr Symbol Start(Symbol::NonTerminal, 1);
+  constexpr Symbol AddtiveExpr(Symbol::NonTerminal, 2);
+  constexpr Symbol MultiplicativeExpr(Symbol::NonTerminal, 3);
+  constexpr Symbol PrimaryExpr(Symbol::NonTerminal, 4);
+
+  SLRGrammar grammar(
+      {{Add, Subtract, Multiply, Divide, LeftParen, RightParen, Literal},
+       {Start, AddtiveExpr, MultiplicativeExpr, PrimaryExpr},
+       {{Start, {AddtiveExpr}},
+        {AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}},
+        {AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}},
+        {AddtiveExpr, {MultiplicativeExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}},
+        {MultiplicativeExpr, {PrimaryExpr}},
+        {PrimaryExpr, {Literal}},
+        {PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}}},
+      {Start, {AddtiveExpr}});
+
+  auto nextState =
+      grammar.GOTO({{{Start, {AddtiveExpr}}, 1},
+                    {{AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}}, 1}},
+                   Add);
 
   std::unordered_set<LR0Item> expected = {
-      {{"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}}, 2},
-      {{"MultiplicativeExpr",
-        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
-       0},
-      {{"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
-       0},
-      {{"MultiplicativeExpr", {"PrimaryExpr"}}, 0},
-      {{"PrimaryExpr", {"Literal"}}, 0},
-      {{"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}, 0},
+      {{AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}}, 2},
+      {{MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}}, 0},
+      {{MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}}, 0},
+      {{MultiplicativeExpr, {PrimaryExpr}}, 0},
+      {{PrimaryExpr, {Literal}}, 0},
+      {{PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}, 0},
   };
   EXPECT_EQ(nextState, expected);
 }
 
-TEST(SLRGrammar, constructCollectionOfItemSet) {
-      SLRGrammar grammar(
-      {"Add", "Subtract", "Multiply", "Divide", "LeftParen", "RightParen",
-       "Literal"},
-      {"Start", "AddtiveExpr", "MultiplicativeExpr", "PrimaryExpr"},
-      {{"Start", {"AddtiveExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Add", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"AddtiveExpr", "Subtract", "MultiplicativeExpr"}},
-       {"AddtiveExpr", {"MultiplicativeExpr"}},
-       {"MultiplicativeExpr",
-        {"MultiplicativeExpr", "Multiply", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"MultiplicativeExpr", "Divide", "PrimaryExpr"}},
-       {"MultiplicativeExpr", {"PrimaryExpr"}},
-       {"PrimaryExpr", {"Literal"}},
-       {"PrimaryExpr", {"LeftParen", "AddtiveExpr", "RightParen"}}},
-      {"Start", {"AddtiveExpr"}});
+TEST(SLRGrammar2, constructCollectionOfItemSet) {
+  constexpr Symbol Add(Symbol::Terminal, '+');
+  constexpr Symbol Subtract(Symbol::Terminal, '-');
+  constexpr Symbol Multiply(Symbol::Terminal, '*');
+  constexpr Symbol Divide(Symbol::Terminal, '/');
+  constexpr Symbol LeftParen(Symbol::Terminal, '(');
+  constexpr Symbol RightParen(Symbol::Terminal, ')');
+  constexpr Symbol Literal(Symbol::Terminal, 256);
 
-      auto [collection, _] = grammar.constructCollectionOfItemSet();
-      // TODO
-      EXPECT_EQ(std::vector<std::unordered_set<LR0Item>>{}, collection);
+  constexpr Symbol Start(Symbol::NonTerminal, 1);
+  constexpr Symbol AddtiveExpr(Symbol::NonTerminal, 2);
+  constexpr Symbol MultiplicativeExpr(Symbol::NonTerminal, 3);
+  constexpr Symbol PrimaryExpr(Symbol::NonTerminal, 4);
+
+  SLRGrammar grammar(
+      {{Add, Subtract, Multiply, Divide, LeftParen, RightParen, Literal},
+       {Start, AddtiveExpr, MultiplicativeExpr, PrimaryExpr},
+       {{Start, {AddtiveExpr}},
+        {AddtiveExpr, {AddtiveExpr, Add, MultiplicativeExpr}},
+        {AddtiveExpr, {AddtiveExpr, Subtract, MultiplicativeExpr}},
+        {AddtiveExpr, {MultiplicativeExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Multiply, PrimaryExpr}},
+        {MultiplicativeExpr, {MultiplicativeExpr, Divide, PrimaryExpr}},
+        {MultiplicativeExpr, {PrimaryExpr}},
+        {PrimaryExpr, {Literal}},
+        {PrimaryExpr, {LeftParen, AddtiveExpr, RightParen}}}},
+      {Start, {AddtiveExpr}});
+
+  auto [collection, _] = grammar.buildAutomaton();
+  // TODO
+  EXPECT_EQ(std::vector<std::unordered_set<LR0Item>>{}, collection);
 }

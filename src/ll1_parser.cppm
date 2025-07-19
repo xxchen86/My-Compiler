@@ -24,9 +24,9 @@ export {
         /// PrimaryExpr ::= Literal | LeftParen AdditiveExpr RightParen
         std::unique_ptr<ast::Expression> parsePrimaryExpr() {
             auto token = lexer.getToken();
-            if (token.type == Token::Literal) {
+            if (token.type == Literal) {
                 return std::make_unique<ast::LiteralExpression>(std::get<int>(token.value));
-            } else if (token.type == Token::LeftParen) {
+            } else if (token.type == LeftParen) {
                 auto ret = parseAddtiveExpr();
                 lexer.getToken();
                 return ret;
@@ -44,12 +44,12 @@ export {
         /// MultiplicativeExprRemainder ::= Multiply PrimaryExpr MultiplicativeExprRemainder | Divide PrimaryExpr MultiplicativeExprRemainder | ε
         std::unique_ptr<ast::Expression> parseMultiplicativeExprRemainder(std::unique_ptr<ast::Expression> left) {
             auto token = lexer.peekToken();
-            if (token.type != Token::Multiply && token.type != Token::Divide) {
+            if (token.type != Multiply && token.type != Divide) {
                 return left;
             }
             auto op = lexer.getToken();
             auto right = parsePrimaryExpr();
-            auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
+            auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), std::get<int>(op.value));
             return parseMultiplicativeExprRemainder(std::move(expr));
         }
 
@@ -62,12 +62,12 @@ export {
         /// AdditiveExprRemainder ::= Add MultiplicativeExpr AdditiveExprRemainder | Subtract MultiplicativeExpr AdditiveExprRemainder | ε
         std::unique_ptr<ast::Expression> parseAddtiveExprRemainder(std::unique_ptr<ast::Expression> left) {
             auto token = lexer.peekToken();
-            if (token.type != Token::Add && token.type != Token::Subtract) {
+            if (token.type != Add && token.type != Subtract) {
                 return left;
             }
             auto op = lexer.getToken();
             auto right = parseMultiplicativeExpr();
-            auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), op.type);
+            auto expr = std::make_unique<ast::BinaryExpression>(std::move(left), std::move(right), std::get<int>(op.value));
             return parseAddtiveExprRemainder(std::move(expr));
         }
 
