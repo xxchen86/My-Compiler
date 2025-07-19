@@ -14,7 +14,7 @@ target_sources(MyCompiler
         src/common/lexer_base.cppm
         src/languages/four_fundamental_arithmetic/ast.cppm
         src/languages/four_fundamental_arithmetic/lexer.cppm
-        # src/ll1_parser.cppm
+        src/languages/four_fundamental_arithmetic/ll1_parser.cppm
         src/languages/four_fundamental_arithmetic/main.cppm
 )
 
@@ -33,11 +33,23 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Add test executable
-add_executable(Tests)
-target_sources(Tests
+add_executable(TestCommon)
+target_sources(TestCommon
     PRIVATE
         tests/test_grammar.cpp
-        tests/test_lexer.cpp
+    PRIVATE
+        FILE_SET cxx_modules TYPE CXX_MODULES FILES
+        src/common/grammar.cppm
+        src/common/lr_parser.cppm
+        src/common/lexer_base.cppm
+)
+target_link_libraries(TestCommon PRIVATE GTest::gtest_main)
+gtest_discover_tests(TestCommon)
+
+add_executable(TestFourFundamentalArithmetic)
+target_sources(TestFourFundamentalArithmetic
+    PRIVATE
+        tests/test_four_fundamental_arithmetic.cpp
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
         src/common/grammar.cppm
@@ -46,8 +58,5 @@ target_sources(Tests
         src/languages/four_fundamental_arithmetic/ast.cppm
         src/languages/four_fundamental_arithmetic/lexer.cppm
 )
-target_link_libraries(Tests PRIVATE GTest::gtest_main)
-target_include_directories(Tests PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-)
-gtest_discover_tests(Tests)
+target_link_libraries(TestFourFundamentalArithmetic PRIVATE GTest::gtest_main)
+gtest_discover_tests(TestFourFundamentalArithmetic)

@@ -2,6 +2,7 @@ module;
 
 #include <concepts>
 #include <variant>
+#include <iostream>
 
 export module lexer_base;
 
@@ -24,5 +25,37 @@ export {
       lexer.peekToken()
     } -> std::convertible_to<typename _LexerType::TokenType>;
     { lexer.eof() } -> std::convertible_to<bool>;
+  };
+
+  template <class _ReadTokenFunc> class LexerBase {
+  public:
+    using TokenType = typename _ReadTokenFunc::TokenType;
+
+    LexerBase(std::istream &in) : in(in) {
+      bufferedToken = readToken(in);
+    }
+
+    TokenType getToken() {
+      if (noTokenAnymore)
+        throw std::runtime_error("no token anymore");
+      if (bufferedToken.type != TokenType::SymbolType::InputRightEndMarker()) {
+        auto ret = bufferedToken;
+        bufferedToken = readToken(in);
+        return ret;
+      } else {
+        noTokenAnymore = true;
+        return bufferedToken;
+      }
+    }
+
+    TokenType peekToken() { return bufferedToken; }
+
+    bool eof() { return noTokenAnymore; }
+
+  private:
+    _ReadTokenFunc readToken;
+    std::istream &in;
+    TokenType bufferedToken;
+    bool noTokenAnymore = false;
   };
 }

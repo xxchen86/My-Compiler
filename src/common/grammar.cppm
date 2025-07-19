@@ -263,6 +263,7 @@ export {
               std::unordered_map<std::pair<StateType, SymbolType>, StateType>>
     buildAutomaton() const {
       std::vector<std::unordered_set<LR0ItemType>> collection = {
+        
           {CLOSURE({{augmentedProduction, 0}})}};
       std::unordered_map<std::pair<StateType, SymbolType>, StateType>
           transitions;

@@ -22,36 +22,19 @@ export {
   constexpr SymbolType LeftParen('(', SymbolType::Terminal);
   constexpr SymbolType RightParen(')', SymbolType::Terminal);
   constexpr SymbolType Literal(256, SymbolType::Terminal);
+  constexpr SymbolType Start{1, SymbolType::NonTerminal};
+  constexpr SymbolType AddtiveExpr{2, SymbolType::NonTerminal};
+  constexpr SymbolType MultiplicativeExpr{3, SymbolType::NonTerminal};
+  constexpr SymbolType PrimaryExpr{4, SymbolType::NonTerminal};
 
-  template <class _TokenType> class Lexer {
-  public:
-    using TokenType = _TokenType;
+  struct ReadToken {
+    using TokenType = Token<SymbolType, int>;
 
-    Lexer(std::istream &in) : in(in), bufferedToken(readToken()) {}
-
-    TokenType getToken() {
-      if (noTokenAnymore)
-        throw std::runtime_error("no token anymore");
-      if (bufferedToken.type != TokenType::SymbolType::InputRightEndMarker()) {
-        auto ret = bufferedToken;
-        bufferedToken = readToken();
-        return ret;
-      } else {
-        noTokenAnymore = true;
-        return bufferedToken;
-      }
-    }
-
-    TokenType peekToken() { return bufferedToken; }
-
-    bool eof() { return noTokenAnymore; }
-
-  private:
-    TokenType readToken() {
+    TokenType operator()(std::istream& in) {
       char c = in.peek();
       if (c == ' ' || c == '\n' || c == '\t') {
         in.get();
-        return readToken();
+        return this->operator()(in);
       } else if (c > '0' && c < '9') {
         int number;
         in >> number;
@@ -63,9 +46,8 @@ export {
         return {{in.get(), TokenType::SymbolType::Terminal}};
       }
     }
-
-    std::istream &in;
-    TokenType bufferedToken;
-    bool noTokenAnymore = false;
   };
+
+  using Lexer = LexerBase<ReadToken>;
+
 }

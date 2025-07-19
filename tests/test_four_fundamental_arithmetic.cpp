@@ -10,7 +10,7 @@ TEST(Lexer, 1) {
   using SymbolType = Symbol<int>;
   using TokenType = Token<SymbolType, int>;
 
-  Lexer<TokenType> lexer(iss);
+  Lexer lexer(iss);
   std::vector<TokenType> tokens;
   while (!lexer.eof()) {
     auto token = lexer.getToken();
