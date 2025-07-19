@@ -34,11 +34,12 @@ export {
 
   template <> struct std::hash<Production> {
     size_t operator()(const Production &prod) const {
-      size_t sizeInBytes = prod.body.size() * sizeof(Symbol);
-      return std::hash<std::string>()(
-                 {reinterpret_cast<const char *>(prod.body.data()),
-                  sizeInBytes}) ^
-             std::hash<Symbol>()(prod.head);
+      size_t seed = std::hash<Symbol>()(prod.head);
+      for (const auto &symbol : prod.body) {
+        // Boost-style hash combination
+        seed ^= std::hash<Symbol>()(symbol) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      }
+      return seed;
     }
   };
 
@@ -156,14 +157,17 @@ export {
 
   template <> struct std::hash<LR0Item> {
     size_t operator()(const LR0Item &item) const {
-      return std::hash<Production>()(item.production) ^
-             std::hash<size_t>()(item.dotPosition);
+      size_t seed = std::hash<Production>()(item.production);
+      seed ^= std::hash<size_t>()(item.dotPosition) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      return seed;
     }
   };
 
   template <> struct std::hash<std::pair<size_t, Symbol>> {
     size_t operator()(const std::pair<size_t, Symbol> &p) const {
-      return std::hash<size_t>()(p.first) ^ std::hash<Symbol>()(p.second);
+      size_t seed = std::hash<size_t>()(p.first);
+      seed ^= std::hash<Symbol>()(p.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      return seed;
     }
   };
 

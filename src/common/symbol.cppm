@@ -24,7 +24,9 @@ export {
 
   template <> struct std::hash<Symbol> {
     size_t operator()(const Symbol &symbol) const {
-      return std::hash<int>()(symbol.type) ^ std::hash<int>()(symbol.id);
+      size_t seed = std::hash<int>()(symbol.type);
+      seed ^= std::hash<int>()(symbol.id) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      return seed;
     }
   };
 
