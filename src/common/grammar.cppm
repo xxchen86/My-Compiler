@@ -263,35 +263,25 @@ export {
               std::unordered_map<std::pair<StateType, SymbolType>, StateType>>
     buildAutomaton() const {
       std::vector<std::unordered_set<LR0ItemType>> collection = {
-        
+
           {CLOSURE({{augmentedProduction, 0}})}};
       std::unordered_map<std::pair<StateType, SymbolType>, StateType>
           transitions;
 
       for (size_t i = 0; i < collection.size(); ++i) {
-        for (auto &terminal : this->terminals) {
-          auto nextItemSet = GOTO(collection[i], terminal);
-          if (nextItemSet.empty())
-            continue;
-          auto nextItemSetIter = std::ranges::find(collection, nextItemSet);
-          if (nextItemSetIter == collection.end()) {
-            transitions[{i, terminal}] = collection.size();
-            collection.push_back(std::move(nextItemSet));
-          } else {
-            transitions[{i, terminal}] = nextItemSetIter - collection.begin();
-          }
-        }
-        for (auto &nonTerminal : this->nonTerminals) {
-          auto nextItemSet = GOTO(collection[i], nonTerminal);
-          if (nextItemSet.empty())
-            continue;
-          auto nextItemSetIter = std::ranges::find(collection, nextItemSet);
-          if (nextItemSetIter == collection.end()) {
-            transitions[{i, nonTerminal}] = collection.size();
-            collection.push_back(std::move(nextItemSet));
-          } else {
-            transitions[{i, nonTerminal}] =
-                nextItemSetIter - collection.begin();
+        for (auto symbolSet : {&this->terminals, &this->nonTerminals}) {
+          for (auto &symbol : *symbolSet) {
+            auto nextItemSet = GOTO(collection[i], symbol);
+            if (nextItemSet.empty())
+              continue;
+            auto nextItemSetIter = std::ranges::find(collection, nextItemSet);
+            if (nextItemSetIter == collection.end()) {
+              transitions[{i, symbol}] = collection.size();
+              collection.push_back(std::move(nextItemSet));
+            } else {
+              transitions[{i, symbol}] =
+                  nextItemSetIter - collection.begin();
+            }
           }
         }
       }
