@@ -10,29 +10,9 @@ module;
 
 export module grammar;
 
+export import symbol;
+
 export {
-  struct Symbol {
-    enum Type : int { Terminal, NonTerminal, Special };
-    Type type;
-    int id;
-
-    bool operator==(const Symbol &other) const {
-      return type == other.type && id == other.id;
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const Symbol &sym) {
-      return os << "Symbol(type=" << sym.type << ", id=" << sym.id << ")";
-    }
-  };
-
-  constexpr Symbol Epsilon = {Symbol::Special, 0};
-  constexpr Symbol InputRightEndMarker = {Symbol::Special, 1};
-
-  template <> struct std::hash<Symbol> {
-    size_t operator()(const Symbol &symbol) const {
-      return std::hash<int>()(symbol.type) ^ std::hash<int>()(symbol.id);
-    }
-  };
 
   struct Production {
     Symbol head;
@@ -148,114 +128,6 @@ export {
       } while (followTableChanged);
       return follow;
     }
-
-    //     std::unordered_map<Symbol, std::unordered_set<Symbol>>
-    //     FOLLOW_Table() const {
-    //       std::unordered_map<Symbol, std::unordered_set<Symbol>> follow;
-    //       // rule 1
-    //       follow[startSymbol].insert(InputRightEndMarker);
-    //       bool changed;
-    //       int round = 0;
-    //       do {
-    //         std::cout << ++round << std::endl;
-    //         changed = false;
-    //         for (auto &production : productions) {
-    //           if (production.head.type != Symbol::NonTerminal)
-    //             continue;
-    //           for (size_t i = 0; i < production.body.size(); ++i) {
-    //             if (production.body[i].type != Symbol::NonTerminal)
-    //               continue;
-    //             if (i != production.body.size() - 1) {
-    //               auto betaFirst = FIRST(production.body[i + 1]);
-    //               std::cout << production.body[i + 1] << " FIRST:" <<
-    //               std::endl; for (auto &s : betaFirst) {
-    //                 std::cout << s << " ";
-    //               }
-    //               std::cout << std::endl;
-    //               // rule 2
-    //               for (auto &a : betaFirst) {
-    //                 if (a != Epsilon &&
-    //                 !follow[production.body[i]].contains(a)) {
-    //                   std::cout << "//// before update " <<
-    //                   production.body[i]
-    //                             << std::endl;
-    //                   for (auto &e : follow[production.body[i]]) {
-    //                     std::cout << e << " ";
-    //                   }
-    //                   std::cout << std::endl;
-    //                   follow[production.body[i]].insert(a);
-    //                   std::cout << "//// after update " << production.body[i]
-    //                             << std::endl;
-    //                   for (auto &e : follow[production.body[i]]) {
-    //                     std::cout << e << " ";
-    //                   }
-    //                   std::cout << std::endl;
-    //                   changed = true;
-    //                   std::cout << "changed = " << changed << std::endl;
-    //                 }
-    //               }
-    //               // rule3
-    //               if (betaFirst.contains(Epsilon)) {
-    //                 const auto &headFollow = follow[production.head];
-    //                 if (!headFollow.empty()) {
-    //                   auto sizeBeforeInsert =
-    //                   follow[production.body[i]].size(); std::cout << "////
-    //                   before update " << production.body[i]
-    //                             << std::endl;
-    //                   for (auto &e : follow[production.body[i]]) {
-    //                     std::cout << e << " ";
-    //                   }
-    //                   std::cout << std::endl;
-    //                   follow[production.body[i]].insert(headFollow.begin(),
-    //                                                     headFollow.end());
-    //                   std::cout << "//// after update " << production.body[i]
-    //                             << std::endl;
-    //                   for (auto &e : follow[production.body[i]]) {
-    //                     std::cout << e << " ";
-    //                   }
-    //                   std::cout << std::endl;
-    //                   auto sizeAfterInsert =
-    //                   follow[production.body[i]].size(); changed =
-    //                   sizeBeforeInsert != sizeAfterInsert; std::cout <<
-    //                   "changed = " << changed << std::endl;
-    //                 }
-    //               }
-    //             } else {
-    //               // rule3
-    //               const auto &headFollow = follow[production.head];
-    //               auto sizeBeforeInsert = follow[production.body[i]].size();
-    //               std::cout << "//// before update " << production.body[i]
-    //                         << std::endl;
-    //               for (auto &e : follow[production.body[i]]) {
-    //                 std::cout << e << " ";
-    //               }
-    //               std::cout << std::endl;
-    //               follow[production.body[i]].insert(headFollow.begin(),
-    //                                                 headFollow.end());
-    //               std::cout << "//// after update " << production.body[i]
-    //                         << std::endl;
-    //               for (auto &e : follow[production.body[i]]) {
-    //                 std::cout << e << " ";
-    //               }
-    //               std::cout << std::endl;
-    //               auto sizeAfterInsert = follow[production.body[i]].size();
-    //               changed = sizeBeforeInsert != sizeAfterInsert;
-    //               std::cout << "changed = " << changed << std::endl;
-    //             }
-    //           }
-    //         }
-
-    //         for (auto &[k, v] : follow) {
-    //           std::cout << k << " FOLLOW:" << std::endl;
-    //           for (auto &s : v) {
-    //             std::cout << s << " ";
-    //           }
-    //           std::cout << std::endl;
-    //         }
-    //         std::cout << "==========" << std::endl;
-    //       } while (changed);
-    //       return follow;
-    //     }
   };
 
   struct LR0Item {

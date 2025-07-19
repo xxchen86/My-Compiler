@@ -4,7 +4,7 @@ project(MyCompiler VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB MODULE_FILES src/*.cppm)
+file(GLOB_RECURSE MODULE_FILES src/*.cppm)
 
 add_executable(MyCompiler)
 target_sources(MyCompiler
@@ -32,8 +32,7 @@ target_sources(Tests
         ${TESTS_LIST}
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/utils.cppm
-        src/grammar.cppm
+        ${MODULE_FILES}
 )
 target_link_libraries(Tests PRIVATE GTest::gtest_main)
 target_include_directories(Tests PRIVATE

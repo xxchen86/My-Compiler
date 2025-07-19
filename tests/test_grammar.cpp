@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 import grammar;
+import symbol;
 
 TEST(Grammar2, FIRST) {
   constexpr Symbol Add(Symbol::Terminal, '+');

@@ -9,6 +9,7 @@ module;
 export module lexer;
 
 import grammar;
+import symbol;
 
 export {
 

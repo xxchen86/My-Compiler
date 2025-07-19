@@ -16,6 +16,7 @@ export module lr_parser;
 
 import lexer;
 import grammar;
+import symbol;
 
 export {
   struct Action {
@@ -34,29 +35,6 @@ export {
     void buildParser() {
       auto follow = grammar.FOLLOW_Table();
       auto [collectionOfItemSet, transitions] = grammar.buildAutomaton();
-
-      
-      // for(auto& [k, v] : follow) {
-      //   std::cout << k << " FOLLOW:" << std::endl;
-      //   for (auto& s : v) {
-      //       std::cout << s << " ";
-      //   }
-      //   std::cout << std::endl;
-      // }
-      // // debug
-      // for (size_t i = 0; i < collectionOfItemSet.size(); ++i) {
-      //   std::cout << "State " << i << std::endl;
-      //   for (auto &item : collectionOfItemSet[i]) {
-      //     std::cout << item << std::endl;
-      //   }
-      //   for (auto &[k, v] : transitions) {
-      //     if (k.first == i) {
-      //       std::cout << "when " << k.second << " goto State " << v
-      //                 << std::endl;
-      //     }
-      //   }
-      //   std::cout << std::endl;
-      // }
 
       for (auto &[k, v] : transitions) {
         auto i = k.first;
