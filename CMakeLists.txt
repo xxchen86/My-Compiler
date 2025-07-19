@@ -12,10 +12,10 @@ target_sources(MyCompiler
         src/common/grammar.cppm
         src/common/lr_parser.cppm
         src/common/lexer_base.cppm
-        src/ast.cppm
-        src/lexer.cppm
+        src/languages/four_fundamental_arithmetic/ast.cppm
+        src/languages/four_fundamental_arithmetic/lexer.cppm
         # src/ll1_parser.cppm
-        src/main.cppm
+        src/languages/four_fundamental_arithmetic/main.cppm
 )
 
 
@@ -43,8 +43,8 @@ target_sources(Tests
         src/common/grammar.cppm
         src/common/lr_parser.cppm
         src/common/lexer_base.cppm
-        src/ast.cppm
-        src/lexer.cppm
+        src/languages/four_fundamental_arithmetic/ast.cppm
+        src/languages/four_fundamental_arithmetic/lexer.cppm
 )
 target_link_libraries(Tests PRIVATE GTest::gtest_main)
 target_include_directories(Tests PRIVATE
