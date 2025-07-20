@@ -9,13 +9,13 @@ add_executable(MyCompiler)
 target_sources(MyCompiler
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/common/grammar.cppm
-        src/common/lr_parser.cppm
-        src/common/lexer_base.cppm
-        src/languages/four_fundamental_arithmetic/ast.cppm
-        src/languages/four_fundamental_arithmetic/lexer.cppm
-        src/languages/four_fundamental_arithmetic/ll1_parser.cppm
-        src/languages/four_fundamental_arithmetic/main.cppm
+        src/parsing/common/grammar.cppm
+        src/parsing/common/lr_parser.cppm
+        src/parsing/common/lexer_base.cppm
+        src/parsing/ast.cppm
+        src/parsing/lexer.cppm
+        src/parsing/ll1_parser.cppm
+        src/parsing/main.cppm
 )
 
 
@@ -39,9 +39,9 @@ target_sources(TestCommon
         tests/test_grammar.cpp
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/common/grammar.cppm
-        src/common/lr_parser.cppm
-        src/common/lexer_base.cppm
+        src/parsing/common/grammar.cppm
+        src/parsing/common/lr_parser.cppm
+        src/parsing/common/lexer_base.cppm
 )
 target_link_libraries(TestCommon PRIVATE GTest::gtest_main)
 gtest_discover_tests(TestCommon)
@@ -52,11 +52,11 @@ target_sources(TestFourFundamentalArithmetic
         tests/test_four_fundamental_arithmetic.cpp
     PRIVATE
         FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/common/grammar.cppm
-        src/common/lr_parser.cppm
-        src/common/lexer_base.cppm
-        src/languages/four_fundamental_arithmetic/ast.cppm
-        src/languages/four_fundamental_arithmetic/lexer.cppm
+        src/parsing/common/grammar.cppm
+        src/parsing/common/lr_parser.cppm
+        src/parsing/common/lexer_base.cppm
+        src/parsing/ast.cppm
+        src/parsing/lexer.cppm
 )
 target_link_libraries(TestFourFundamentalArithmetic PRIVATE GTest::gtest_main)
 gtest_discover_tests(TestFourFundamentalArithmetic)

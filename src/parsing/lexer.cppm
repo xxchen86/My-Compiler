@@ -22,6 +22,7 @@ export {
   constexpr SymbolType LeftParen('(', SymbolType::Terminal);
   constexpr SymbolType RightParen(')', SymbolType::Terminal);
   constexpr SymbolType Literal(256, SymbolType::Terminal);
+  
   constexpr SymbolType Start{1, SymbolType::NonTerminal};
   constexpr SymbolType AddtiveExpr{2, SymbolType::NonTerminal};
   constexpr SymbolType MultiplicativeExpr{3, SymbolType::NonTerminal};

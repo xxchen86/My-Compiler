@@ -42,23 +42,34 @@ export {
       for (auto &[k, v] : transitions) {
         auto i = k.first;
         const auto &sym = k.second;
-        if (sym.type == SymbolType::Terminal)
-          ACTION[{i, sym}] = {Action::Shift, transitions[{i, sym}]};
-        else
+        if (sym.type == SymbolType::Terminal) {
+          if (ACTION.contains({i, sym}))
+            throw std::runtime_error("conflict");
+          else
+            ACTION[{i, sym}] = {Action::Shift, transitions[{i, sym}]};
+        } else {
           GOTO[{i, sym}] = transitions[{i, sym}];
+        }
       }
       for (size_t i = 0; i < collectionOfItemSet.size(); ++i) {
         for (auto &item : collectionOfItemSet[i]) {
           if (item.reducible()) {
             for (auto &s : follow[item.production.head]) {
+              if (ACTION.contains({i, s}))
+                throw std::runtime_error("conflict");
               ACTION[{i, s}] = {Action::Reduce, item.production};
             }
           }
         }
-        if (collectionOfItemSet[i].contains({grammar.augmentedProduction, 1}))
-          ACTION[{i, SymbolType::InputRightEndMarker()}] = {Action::Accept};
+        if (collectionOfItemSet[i].contains({grammar.augmentedProduction, 1})) {
+          if (ACTION.contains({i, SymbolType::InputRightEndMarker()}))
+            throw std::runtime_error("conflict");
+          else
+            ACTION[{i, SymbolType::InputRightEndMarker()}] = {Action::Accept};
+        }
       }
     }
+
 
     void parse() {
       stateStack.push(0);
@@ -70,8 +81,6 @@ export {
           case Action::Shift:
             lexer.getToken();
             stateStack.push(std::get<size_t>(act.value));
-            std::cout << "shift current state: " << stateStack.top()
-                      << std::endl;
             break;
           case Action::Reduce:
             for (auto i = 0;
@@ -80,8 +89,6 @@ export {
             }
             stateStack.push(GOTO[{stateStack.top(),
                                   std::get<ProductionType>(act.value).head}]);
-            std::cout << "reduce" << std::get<ProductionType>(act.value)
-                      << " current state: " << stateStack.top() << std::endl;
             break;
           case Action::Accept:
             std::cout << "Accept" << std::endl;
@@ -96,7 +103,7 @@ export {
       }
     }
 
-  public: // TODO: for debug
+  private:
     LexerType &lexer;
     std::stack<StateType> stateStack;
     const GrammarType &grammar;

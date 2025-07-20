@@ -20,7 +20,7 @@ int main(int, char **) {
 
   Lexer lexer(iss);
 
-  if (true) {
+  if (false) {
     LL1Parser parser(lexer);
     auto ast = parser.parse();
     ast->print(std::cout);
